@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "419190551888",
+    "firebase_url": "https://peetme-89af5.firebaseio.com",
+    "project_id": "peetme-89af5",
+    "storage_bucket": "peetme-89af5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:419190551888:android:e2ce8dc3ba4787cd",
+        "android_client_info": {
+          "package_name": "peetme.app.trunimal.com.peetme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "419190551888-u5m3158fh980mislrikvnjle8cbcu7tg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "peetme.app.trunimal.com.peetme",
+            "certificate_hash": "B0E691C94919AE9D0EA12662FEA25555D318F6A0"
+          }
+        },
+        {
+          "client_id": "419190551888-n5aatttvl1kfuuu47u7p6phfj97hel5j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiNI9Y2lw360FZwjBH1ccoh_Wqe0er5wA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "419190551888-n5aatttvl1kfuuu47u7p6phfj97hel5j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
