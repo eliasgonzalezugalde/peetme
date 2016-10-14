@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_splash"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="peetme.app.trunimal.com.peetme.SplashActivity"
+    android:background="#333">
+
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="peetme.app.trunimal.com.peetme.AnimalMapsActivity" />
+
+    <Button
+        android:id="@+id/listAnimalBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="List"
+        android:padding="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="13dp" />
+
+    <Button
+        android:id="@+id/addAnimalBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="add animal"
+        android:padding="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_alignBaseline="@+id/listAnimalBtn"
+        android:layout_alignBottom="@+id/listAnimalBtn"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>
+
+

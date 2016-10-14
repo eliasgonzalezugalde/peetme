@@ -9,10 +9,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+//import com.firebase.client.DataSnapshot;
+//import com.firebase.client.Firebase;
+//import com.firebase.client.FirebaseError;
+//import com.firebase.client.ValueEventListener;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -21,7 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
+    /*
     FirebaseListAdapter<Pet> firebaseListAdapter;
     ArrayList<Pet> pets = new ArrayList<>();
     private Firebase mRef;
@@ -87,12 +87,14 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot msgSnapshot: snapshot.getChildren()) {
 
                     Pet pet = msgSnapshot.getValue(Pet.class);
-                    /*
+
+                    //comentar
                     pet.setName(msgSnapshot.getValue(Pet.class).getName());
                     pet.setCat(msgSnapshot.getValue(Pet.class).getCat());
                     pet.setPhoto(msgSnapshot.getValue(Pet.class).getPhoto());
                     pets.add(pet);
-                    */
+                    //comentar
+
                     Log.i("   Name", pet.getName()+", Cat: " + pet.getCat());
                 }
             }
@@ -109,4 +111,5 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
     }
+    */
 }

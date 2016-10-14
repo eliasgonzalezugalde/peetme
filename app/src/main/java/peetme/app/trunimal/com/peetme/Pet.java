@@ -7,40 +7,39 @@ package peetme.app.trunimal.com.peetme;
 public class Pet {
 
     String name;
-    String cat;
-    int photo;
+    String description;
+    String image;
 
     public Pet() {
     }
 
-    public Pet(String name, String cat, int photo) {
-        this.name = name;
-        this.cat = cat;
-        this.photo = photo;
+    public Pet(String title, String description, String image) {
+        this.name = title;
+        this.description = description;
+        this.image = image;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setCat(String cat) {
-        this.cat = cat;
-    }
-
-    public void setPhoto(int photo) {
-        this.photo = photo;
-    }
-
-    public String getName() {
-
+    public String getTitle() {
         return name;
     }
 
-    public String getCat() {
-        return cat;
+    public void setName(String title) {
+        this.name = title;
     }
 
-    public int getPhoto() {
-        return photo;
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

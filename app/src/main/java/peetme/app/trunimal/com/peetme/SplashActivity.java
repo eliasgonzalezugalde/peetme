@@ -32,7 +32,7 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onAnimationEnd(Animation animation) {
                 finish();
-                Intent i = new Intent(SplashActivity.this, IndexActivity.class);
+                Intent i = new Intent(SplashActivity.this, AnimalMapsActivity.class);
                 startActivity(i);
             }
 

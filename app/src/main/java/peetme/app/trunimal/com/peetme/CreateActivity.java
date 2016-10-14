@@ -12,13 +12,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.util.Random;
 
 public class CreateActivity extends AppCompatActivity {
 
@@ -31,6 +37,7 @@ public class CreateActivity extends AppCompatActivity {
     private Button submitBtn;
     private Uri imageUri = null;
     private StorageReference mStorage;
+    private DatabaseReference mDatabase;
     private ProgressDialog mProgress;
 
     @Override
@@ -40,6 +47,7 @@ public class CreateActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create);
 
         mStorage = FirebaseStorage.getInstance().getReference();
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("pet");
 
         selectImage = (ImageButton) findViewById(R.id.selectImage);
         nameField = (EditText) findViewById(R.id.nameField);
@@ -75,26 +83,49 @@ public class CreateActivity extends AppCompatActivity {
 
         mProgress.setMessage("Posting ...");
         mProgress.show();
-
-        String name_val = nameField.getText().toString().trim();
-        String desc_val = descField.getText().toString().trim();
+        final String name_val = nameField.getText().toString().trim();
+        final String desc_val = descField.getText().toString().trim();
 
         if (!TextUtils.isEmpty(name_val) && !TextUtils.isEmpty(desc_val) && imageUri != null ) {
 
-            StorageReference filepath = mStorage.child("Pet_Images").child(imageUri.getLastPathSegment());
-
+            //StorageReference filepath = mStorage.child("Pet_Images").child(imageUri.getLastPathSegment());
+            StorageReference filepath = mStorage.child("Pet_Images").child(random());
             filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
                     Uri donwloadUrl = taskSnapshot.getDownloadUrl();
+                    DatabaseReference newPet = mDatabase.push();
+                    newPet.child("name").setValue(name_val);
+                    newPet.child("description").setValue(desc_val);
+                    newPet.child("image").setValue(donwloadUrl.toString());
+                    //newPet.child("uid").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
                     mProgress.dismiss();
+                    Toast.makeText(CreateActivity.this, "Done", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(CreateActivity.this, AnimalMapsActivity.class));
 
                 }
             });
 
         }
 
+    }
+
+    public static String random() {
+
+        Random generator = new Random();
+        StringBuilder randomStringBuilder = new StringBuilder();
+        int randomLength = generator.nextInt(22);
+        char tempChar;
+
+        for (int i = 0; i < randomLength; i++){
+
+            tempChar = (char) (generator.nextInt(96) + 32);
+            randomStringBuilder.append(tempChar);
+
+        }
+
+        return randomStringBuilder.toString();
     }
 
     @Override
@@ -104,7 +135,6 @@ public class CreateActivity extends AppCompatActivity {
         if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK) {
 
             imageUri = data.getData();
-
             CropImage.activity(imageUri)
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .setAspectRatio(4,3)
@@ -114,13 +144,13 @@ public class CreateActivity extends AppCompatActivity {
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
+            //aqui imagen
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
             if (resultCode == RESULT_OK) {
 
-                Uri resultUri = result.getUri();
-
-                selectImage.setImageURI(resultUri);
+                imageUri = result.getUri();
+                selectImage.setImageURI(imageUri);
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
 
@@ -129,6 +159,6 @@ public class CreateActivity extends AppCompatActivity {
             }
         }
 
-
     }
+
 }

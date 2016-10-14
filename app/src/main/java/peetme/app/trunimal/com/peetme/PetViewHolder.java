@@ -1,9 +1,12 @@
 package peetme.app.trunimal.com.peetme;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by elias on 23/9/2016.
@@ -11,24 +14,34 @@ import android.widget.TextView;
 
 public class PetViewHolder extends RecyclerView.ViewHolder {
 
-    TextView txtPet;
-    TextView txtCategory;
+      View mView;
 
     public PetViewHolder(View itemView) {
+
         super(itemView);
-        txtPet = (TextView)itemView.findViewById(R.id.messageTxt);
-        txtCategory = (TextView)itemView.findViewById(R.id.messageTxt);
+        mView = itemView;
+
     }
 
-    //revisar estos campos
+    public void setTitle(String title) {
 
-    public void setName(String name) {
-        TextView field = (TextView) itemView.findViewById(android.R.id.text1);
-        field.setText(name);
+        TextView animalTitle = (TextView)mView.findViewById(R.id.animalTitle);
+        animalTitle.setText(title);
+
     }
 
-    public void setText(String text) {
-        TextView field = (TextView) itemView.findViewById(android.R.id.text2);
-        field.setText(text);
+    public void setDesc(String desc) {
+
+        TextView animalDesc = (TextView)mView.findViewById(R.id.animalDesc);
+        animalDesc.setText(desc);
+
     }
+
+    public void setImage(Context ctx, String image) {
+
+        ImageView animalImage = (ImageView)mView.findViewById(R.id.animalImage);
+        Picasso.with(ctx).load(image).into(animalImage);
+
+    }
+
 }
