@@ -1,15 +1,18 @@
 package peetme.app.trunimal.com.peetme;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class AnimalListActivity extends AppCompatActivity {
+public class PetIndexActivity extends AppCompatActivity {
 
     private RecyclerView animalList;
     private DatabaseReference mDatabase;
@@ -17,7 +20,8 @@ public class AnimalListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_animal_list);
+        setContentView(R.layout.activity_pet_index);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("pet");
 
@@ -42,7 +46,7 @@ public class AnimalListActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(PetViewHolder viewHolder, Pet model, int position) {
 
-                viewHolder.setTitle(model.getTitle());
+                viewHolder.setTitle(model.getName());
                 viewHolder.setDesc(model.getDescription());
                 viewHolder.setImage(getApplicationContext(), model.getImage());
 
@@ -51,5 +55,26 @@ public class AnimalListActivity extends AppCompatActivity {
 
         animalList.setAdapter(firebaseRecyclerAdapter);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.action_add) {
+            startActivity(new Intent(PetIndexActivity.this, PetCreateActivity.class));
+        } else {
+            this.finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

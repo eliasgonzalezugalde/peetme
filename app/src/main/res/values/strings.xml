@@ -1,8 +1,57 @@
 <resources>
     <string name="app_name">Peetme</string>
-    <string name="title_activity_detail">DetailActivity</string>
-    <string name="title_activity_recycler">RecyclerActivity</string>
-    <string name="title_activity_asd">asd</string>
-    <string name="title_activity_main2">Main2Activity</string>
     <string name="title_activity_animal_maps">Map</string>
+    <string name="title_activity_main">Peetme</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="sing_out">Sing out</string>
+    <string name="animals">Animals</string>
+    <string name="vets">Vets</string>
+    <string name="animal_shelters">Animal shelters</string>
+    <string name="stray_animal">Stray animals</string>
+    <string name="nav_map">Map</string>
+
+    <string name="title_activity_pet_index">Animals</string>
+    <string name="title_activity_pet_create">Adding an animal</string>
+
+    <string name="name">Name</string>
+    <string name="description">Description</string>
+    <string name="breed">Breed</string>
+    <string id="select_gender" name="select_gender">Select gender</string>
+    <string id="female" name="female">Female</string>
+    <string id="male" name="male">Male</string>
+    <string name="age">Age</string>
+    <string id="size" name="size">Size</string>
+    <string id="health" name="health">Health</string>
+
+    <string id="select_size" name="select_size">Select size</string>
+    <string id="select_size_small" name="select_size_small">Small</string>
+    <string id="select_size_medium" name="select_size_medium">Medium</string>
+    <string id="select_size_large" name="select_size_large">Large</string>
+
+    <string id="select_species" name="select_species">Select species</string>
+    <string id="species" name="species">Species</string>
+    <string id="dog" name="dog">Dog</string>
+    <string id="cat" name="cat">Cat</string>
+    <string id="rabbit" name="rabbit">Rabbit</string>
+    <string id="pig" name="pig">Pig</string>
+    <string id="bird" name="bird">Bird</string>
+    <string id="rodent" name="rodent">Rodent</string>
+    <string id="other" name="other">Other</string>
+
+    <string id="castrated" name="castrated">Castrated</string>
+    <string id="wormed" name="wormed">Wormed</string>
+    <string id="vaccinated" name="vaccinated">Vaccinated</string>
+
+    <string name="select_health">Select health</string>
+    <string name="select_health_bad">Bad</string>
+    <string name="select_health_ok">OK</string>
+    <string name="select_health_good">Good</string>
+
+    <string name="additionalInfo">Additional info</string>
+    <string name="submitBtn">Submit</string>
+
 </resources>

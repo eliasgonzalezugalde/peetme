@@ -3,7 +3,8 @@ package peetme.app.trunimal.com.peetme;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -14,35 +15,29 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class AnimalMapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private Button addAnimalBtn;
     private Button listAnimalBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_animal_maps);
+
+
+
+        setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        addAnimalBtn = (Button) findViewById(R.id.addAnimalBtn);
         listAnimalBtn = (Button) findViewById(R.id.listAnimalBtn);
-
-        addAnimalBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(AnimalMapsActivity.this, CreateActivity.class));
-            }
-        });
 
         listAnimalBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(AnimalMapsActivity.this, AnimalListActivity.class));
+                startActivity(new Intent(MapsActivity.this, PetIndexActivity.class));
             }
         });
 
@@ -60,6 +55,7 @@ public class AnimalMapsActivity extends FragmentActivity implements OnMapReadyCa
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
@@ -68,10 +64,29 @@ public class AnimalMapsActivity extends FragmentActivity implements OnMapReadyCa
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.animateCamera( CameraUpdateFactory.zoomTo( 17.0f ) );
 
-//        int permissionCheck = ContextCompat.checkSelfPermission(AnimalMapsActivity.this,
+//        int permissionCheck = ContextCompat.checkSelfPermission(MapsActivity.this,
 //                Manifest.permission.ACCESS_FINE_LOCATION);
 //
 //        mMap.setMyLocationEnabled(true);
 
     }
+//revisar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.action_add) {
+            startActivity(new Intent(MapsActivity.this, PetCreateActivity.class));
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }

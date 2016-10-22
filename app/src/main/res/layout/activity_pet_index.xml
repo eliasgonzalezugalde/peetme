@@ -4,14 +4,13 @@
     android:id="@+id/activity_animal_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="peetme.app.trunimal.com.peetme.AnimalListActivity">
+    tools:context="peetme.app.trunimal.com.peetme.PetIndexActivity">
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/animalList">
-
-
     </android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>
+
