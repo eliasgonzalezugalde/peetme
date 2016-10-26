@@ -65,17 +65,13 @@
             android:layout_marginTop="20dp"
             android:hint="@string/description" />
 
-        <EditText
+        <Spinner
+            android:id="@+id/spinnerAge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:padding="15dp"
-            android:background="@drawable/input_outline"
-            android:id="@+id/ageField"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
-            android:hint="@string/age"/>
+            android:background="@drawable/input_outline" />
 
         <Spinner
             android:id="@+id/spinnerGender"

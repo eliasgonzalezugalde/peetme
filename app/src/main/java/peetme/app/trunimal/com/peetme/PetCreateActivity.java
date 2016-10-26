@@ -49,7 +49,6 @@ public class PetCreateActivity extends AppCompatActivity {
 
     private EditText nameField;
     private EditText descField;
-    private EditText ageField;
     private EditText additionalInfoField;
     private Button submitBtn;
 
@@ -58,6 +57,7 @@ public class PetCreateActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private ProgressDialog mProgress;
 
+    private Spinner spinnerAge;
     private Spinner spinnerHealth;
     private Spinner spinnerSize;
     private Spinner spinnerSpecies;
@@ -78,6 +78,7 @@ public class PetCreateActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //rellenando dropdown'charSequence
+        String[]age = { getResources().getString(R.string.select_age), getResources().getString(R.string.select_age_puppy), getResources().getString(R.string.select_age_young), getResources().getString(R.string.select_age_adult), getResources().getString(R.string.select_age_old)};
         String[]health = { getResources().getString(R.string.select_health), getResources().getString(R.string.select_health_bad), getResources().getString(R.string.select_health_ok), getResources().getString(R.string.select_health_good)};
         String[]size = { getResources().getString(R.string.select_size), getResources().getString(R.string.select_size_small), getResources().getString(R.string.select_size_medium), getResources().getString(R.string.select_size_large)};
         String[]species = { getResources().getString(R.string.select_species), getResources().getString(R.string.dog), getResources().getString(R.string.cat), getResources().getString(R.string.rabbit), getResources().getString(R.string.pig), getResources().getString(R.string.bird), getResources().getString(R.string.rodent), getResources().getString(R.string.other)};
@@ -89,7 +90,6 @@ public class PetCreateActivity extends AppCompatActivity {
         selectImage = (ImageButton) findViewById(R.id.selectImage);
         nameField = (EditText) findViewById(R.id.nameField);
         descField = (EditText) findViewById(R.id.descField);
-        ageField = (EditText) findViewById(R.id.ageField);
         additionalInfoField = (EditText) findViewById(R.id.additionalInfoField);
 
         switchCastrated = (Switch) findViewById(R.id.switchCastrated);
@@ -100,16 +100,19 @@ public class PetCreateActivity extends AppCompatActivity {
 
         mProgress = new ProgressDialog(this);
 
+        spinnerAge = (Spinner) findViewById(R.id.spinnerAge);
         spinnerHealth = (Spinner)findViewById(R.id.spinnerHealth);
         spinnerSize = (Spinner) findViewById(R.id.spinnerSize);
         spinnerSpecies = (Spinner) findViewById(R.id.spinnerSpecies);
         spinnerGender = (Spinner) findViewById(R.id.spinnerGender);
 
+        final List<String> ageList = new ArrayList<>(Arrays.asList(age));
         final List<String> healthList = new ArrayList<>(Arrays.asList(health));
         final List<String> sizeList = new ArrayList<>(Arrays.asList(size));
         final List<String> speciesList = new ArrayList<>(Arrays.asList(species));
         final List<String> genderList = new ArrayList<>(Arrays.asList(gender));
 
+        createDropdown(ageList, spinnerAge);
         createDropdown(healthList, spinnerHealth);
         createDropdown(sizeList, spinnerSize);
         createDropdown(speciesList, spinnerSpecies);
@@ -118,6 +121,7 @@ public class PetCreateActivity extends AppCompatActivity {
         date = new Date();
         charSequence = DateFormat.format("MMMM date, yyyy ", date.getTime());
 
+        /*
         spinnerSpecies.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -137,47 +141,7 @@ public class PetCreateActivity extends AppCompatActivity {
 
             }
         });
-
-        spinnerSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItemText = (String) parent.getItemAtPosition(position);
-                // If user change the default selection
-                // First item is disable and it is used for hint
-                if(position > 0){
-                    // Notify the selected item text
-                    Toast.makeText
-                            (getApplicationContext(), getResources().getString(R.string.size) + ": " + selectedItemText, Toast.LENGTH_SHORT)
-                            .show();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        spinnerHealth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItemText = (String) parent.getItemAtPosition(position);
-                // If user change the default selection
-                // First item is disable and it is used for hint
-                if(position > 0){
-                    // Notify the selected item text
-                    Toast.makeText
-                            (getApplicationContext(), getResources().getString(R.string.health) + ": " + selectedItemText, Toast.LENGTH_SHORT)
-                            .show();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        //spinnerHealth.setOnItemSelectedListener(this);
+        */
 
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -242,14 +206,14 @@ public class PetCreateActivity extends AppCompatActivity {
     }
 
     private void startPosting() {
-
-        mProgress.setMessage("Posting ...");
+        mProgress.setMessage(getResources().getString(R.string.saving) + " ...");
         mProgress.show();
+
         final String name_val = nameField.getText().toString().trim();
         final String desc_val = descField.getText().toString().trim();
-        final String age_val = ageField.getText().toString().trim();
         final String additional_info_val = additionalInfoField.getText().toString().trim();
 
+        final String age_val = spinnerAge.getSelectedItem().toString().trim();
         final String species_val = spinnerSpecies.getSelectedItem().toString().trim();
         final String gender_val = spinnerSpecies.getSelectedItem().toString().trim();
         final String size_val = spinnerSpecies.getSelectedItem().toString().trim();
@@ -288,7 +252,7 @@ public class PetCreateActivity extends AppCompatActivity {
 
                     newPet.child("description").setValue(desc_val);
                     newPet.child("image").setValue(donwloadUrl.toString());
-                    newPet.child("name").setValue(name_val);
+                    newPet.child("name").setValue(nameField.getText().toString().trim());
                     newPet.child("info").setValue(additional_info_val);
 
                     newPet.child("age").setValue(age_val);
@@ -303,12 +267,12 @@ public class PetCreateActivity extends AppCompatActivity {
 
                     //id_user
                     //newPet.child("uid").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                    newPet.child("uid").setValue("1");
+                    newPet.child("uid").setValue(1);
 
                     newPet.child("reports").setValue("0");
 
-                    newPet.child("modifiedDate").setValue(charSequence);
-                    newPet.child("createdDate").setValue(charSequence);
+                    newPet.child("modifiedDate").setValue(String.valueOf(charSequence));
+                    newPet.child("createdDate").setValue(String.valueOf(charSequence));
 
                     //Geofire
                     newPet.child("ubication").setValue("10.323266, -84.431012");
@@ -316,8 +280,8 @@ public class PetCreateActivity extends AppCompatActivity {
                     newPet.child("active").setValue(true);
 
                     mProgress.dismiss();
-                    Toast.makeText(PetCreateActivity.this, "Done", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(PetCreateActivity.this, MainActivity.class));
+                    Toast.makeText(PetCreateActivity.this, getResources().getString(R.string.saved), Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(PetCreateActivity.this, PetIndexActivity.class));
 
                 }
             });

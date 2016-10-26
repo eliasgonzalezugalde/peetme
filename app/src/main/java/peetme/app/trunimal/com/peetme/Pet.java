@@ -10,13 +10,14 @@ import java.util.Date;
 
 public class Pet {
 
-    String name, description, image, species, gender, size, health, additionalInfo, ubication, modifiedDate, createdDate, userId, age, reports;
-    Boolean castrated, wormed, vaccinated, adopted, active;
+    private int userId;
+    private  String name, description, image, species, gender, size, health, additionalInfo, ubication, modifiedDate, createdDate, age, reports;
+    private Boolean castrated, wormed, vaccinated, adopted, active;
 
     public Pet() {
     }
 
-    public Pet(String userId, String age, String reports, String name, String description, String image, String species, String breed, String gender, String size, String health, String additionalInfo, String modifiedDate, String createdDate, String ubication, Boolean castrated, Boolean wormed, Boolean vaccinated, Boolean adopted, Boolean active) {
+    public Pet(int userId, String age, String reports, String name, String description, String image, String species, String breed, String gender, String size, String health, String additionalInfo, String modifiedDate, String createdDate, String ubication, Boolean castrated, Boolean wormed, Boolean vaccinated, Boolean adopted, Boolean active) {
         this.userId = userId;
         this.age = age;
         this.reports = reports;
@@ -38,11 +39,11 @@ public class Pet {
         this.active = active;
     }
 
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 

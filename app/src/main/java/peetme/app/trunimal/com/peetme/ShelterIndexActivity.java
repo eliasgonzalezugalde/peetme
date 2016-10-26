@@ -12,23 +12,23 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class PetIndexActivity extends AppCompatActivity {
+public class ShelterIndexActivity extends AppCompatActivity {
 
-    private RecyclerView petList;
+    private RecyclerView shelterList;
     private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pet_index);
+        setContentView(R.layout.activity_shelter_index);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("pet");
 
-        petList = (RecyclerView) findViewById(R.id.animalList);
-        petList.setHasFixedSize(true);
-        petList.setLayoutManager(new LinearLayoutManager(this));
+        shelterList = (RecyclerView) findViewById(R.id.shelterList);
+        shelterList.setHasFixedSize(true);
+        shelterList.setLayoutManager(new LinearLayoutManager(this));
 
     }
 
@@ -54,7 +54,7 @@ public class PetIndexActivity extends AppCompatActivity {
             }
         };
 
-        petList.setAdapter(firebaseRecyclerAdapter);
+        shelterList.setAdapter(firebaseRecyclerAdapter);
 
     }
 
@@ -70,7 +70,7 @@ public class PetIndexActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.action_add) {
-            startActivity(new Intent(PetIndexActivity.this, PetCreateActivity.class));
+            startActivity(new Intent(ShelterIndexActivity.this, ShelterCreateActivity.class));
         } else {
             this.finish();
             return true;
@@ -78,5 +78,5 @@ public class PetIndexActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-    
+
 }

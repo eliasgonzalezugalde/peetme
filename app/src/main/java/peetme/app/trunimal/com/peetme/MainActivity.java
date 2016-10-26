@@ -128,9 +128,15 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_vets) {
 
+            startActivity(new Intent(MainActivity.this, VetIndexActivity.class));
+
         } else if (id == R.id.nav_animal_shelters) {
 
+            startActivity(new Intent(MainActivity.this, ShelterIndexActivity.class));
+
         } else if (id == R.id.nav_stray_animal) {
+
+            startActivity(new Intent(MainActivity.this, StrayIndexActivity.class));
 
         } else if (id == R.id.nav_settings) {
 

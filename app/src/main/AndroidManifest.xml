@@ -41,7 +41,9 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
-        <activity android:name=".PetCreateActivity" android:label="@string/title_activity_pet_create" />
+        <activity
+            android:name=".PetCreateActivity"
+            android:label="@string/title_activity_pet_create" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -57,11 +59,31 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_animal_maps" />
-        <activity android:name=".PetIndexActivity" android:label="@string/title_activity_pet_index" />
+        <activity
+            android:name=".PetIndexActivity"
+            android:label="@string/title_activity_pet_index" />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".VetIndexActivity"
+            android:label="@string/title_activity_vet_index" />
+        <activity
+            android:name=".VetCreateActivity"
+            android:label="@string/title_activity_vet_create" />
+        <activity
+            android:name=".ShelterIndexActivity"
+            android:label="@string/title_activity_shelter_index" />
+        <activity
+            android:name=".ShelterCreateActivity"
+            android:label="@string/title_activity_shelter_create" />
+        <activity
+            android:name=".StrayIndexActivity"
+            android:label="@string/title_activity_stray_index" />
+        <activity
+            android:name=".StrayCreateActivity"
+            android:label="@string/title_activity_stray_create"></activity>
     </application>
 
 </manifest>

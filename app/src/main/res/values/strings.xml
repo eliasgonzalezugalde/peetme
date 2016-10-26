@@ -17,34 +17,52 @@
     <string name="title_activity_pet_index">Animals</string>
     <string name="title_activity_pet_create">Adding an animal</string>
 
+    <string name="title_activity_vet_index">Vets</string>
+    <string name="title_activity_vet_create">Adding a vet</string>
+
+    <string name="title_activity_shelter_index">Shelters</string>
+    <string name="title_activity_shelter_create">Adding a shelter</string>
+
+    <string name="title_activity_stray_index">Stray animals</string>
+    <string name="title_activity_stray_create">Adding a stray animal</string>
+
+    <string name="saving" id="saving">Saving</string>
+    <string name="saved" id="saved">Animal successfully saved</string>
+
     <string name="name">Name</string>
     <string name="description">Description</string>
     <string name="breed">Breed</string>
-    <string id="select_gender" name="select_gender">Select gender</string>
-    <string id="female" name="female">Female</string>
-    <string id="male" name="male">Male</string>
+    <string name="select_gender" id="select_gender">Select gender</string>
+    <string name="female" id="female">Female</string>
+    <string name="male" id="male">Male</string>
     <string name="age">Age</string>
-    <string id="size" name="size">Size</string>
-    <string id="health" name="health">Health</string>
+    <string name="size" id="size">Size</string>
+    <string name="health" id="health">Health</string>
 
-    <string id="select_size" name="select_size">Select size</string>
-    <string id="select_size_small" name="select_size_small">Small</string>
-    <string id="select_size_medium" name="select_size_medium">Medium</string>
-    <string id="select_size_large" name="select_size_large">Large</string>
+    <string name="select_size" id="select_size">Select size</string>
+    <string name="select_size_small" id="select_size_small">Small</string>
+    <string name="select_size_medium" id="select_size_medium">Medium</string>
+    <string name="select_size_large" id="select_size_large">Large</string>
 
-    <string id="select_species" name="select_species">Select species</string>
-    <string id="species" name="species">Species</string>
-    <string id="dog" name="dog">Dog</string>
-    <string id="cat" name="cat">Cat</string>
-    <string id="rabbit" name="rabbit">Rabbit</string>
-    <string id="pig" name="pig">Pig</string>
-    <string id="bird" name="bird">Bird</string>
-    <string id="rodent" name="rodent">Rodent</string>
-    <string id="other" name="other">Other</string>
+    <string name="select_age" id="select_age">Select age</string>
+    <string name="select_age_puppy" id="select_age_puppy">Puppy</string>
+    <string name="select_age_young" id="select_age_young">Young</string>
+    <string name="select_age_adult" id="select_age_adult">Adult</string>
+    <string name="select_age_old" id="select_age_old">Old</string>
 
-    <string id="castrated" name="castrated">Castrated</string>
-    <string id="wormed" name="wormed">Wormed</string>
-    <string id="vaccinated" name="vaccinated">Vaccinated</string>
+    <string name="select_species" id="select_species">Select species</string>
+    <string name="species" id="species">Species</string>
+    <string name="dog" id="dog">Dog</string>
+    <string name="cat" id="cat">Cat</string>
+    <string name="rabbit" id="rabbit">Rabbit</string>
+    <string name="pig" id="pig">Pig</string>
+    <string name="bird" id="bird">Bird</string>
+    <string name="rodent" id="rodent">Rodent</string>
+    <string name="other" id="other">Other</string>
+
+    <string name="castrated" id="castrated">Castrated</string>
+    <string name="wormed" id="wormed">Wormed</string>
+    <string name="vaccinated" id="vaccinated">Vaccinated</string>
 
     <string name="select_health">Select health</string>
     <string name="select_health_bad">Bad</string>

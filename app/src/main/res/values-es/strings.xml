@@ -17,6 +17,18 @@
     <string name="title_activity_pet_index">Animales</string>
     <string name="title_activity_pet_create">Agregando un animal</string>
 
+    <string name="title_activity_vet_index">Veterinarias</string>
+    <string name="title_activity_vet_create">Agregando veterinaria</string>
+
+    <string name="title_activity_shelter_index">Refugios</string>
+    <string name="title_activity_shelter_create">Agregando un refugio</string>
+
+    <string name="title_activity_stray_index">Animales extraviados</string>
+    <string name="title_activity_stray_create">Agregando un animal extraviado</string>
+
+    <string id="saving" name="saving">Guardando</string>
+    <string id="saved" name="saved">Animal guardado exitosamente</string>
+
     <string name="name">Nombre</string>
     <string name="description">Descripción</string>
     <string name="breed">Raza</string>
@@ -31,6 +43,12 @@
     <string id="select_size_small" name="select_size_small">Pequeño</string>
     <string id="select_size_medium" name="select_size_medium">Mediano</string>
     <string id="select_size_large" name="select_size_large">Grande</string>
+
+    <string id="select_age" name="select_age">Seleccione la edad</string>
+    <string id="select_age_puppy" name="select_age_puppy">Cachorro</string>
+    <string id="select_age_young" name="select_age_young">Joven</string>
+    <string id="select_age_adult" name="select_age_adult">Adulto</string>
+    <string id="select_age_old" name="select_age_old">Viejo</string>
 
     <string id="select_species" name="select_species">Seleccione la especie</string>
     <string id="species" name="species">Especie</string>
