@@ -1,17 +1,26 @@
 package peetme.app.trunimal.com.peetme;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,8 +30,13 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -31,30 +45,30 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-public class PetCreateActivity extends AppCompatActivity {
+public class PetCreateActivity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int GALLERY_REQUEST = 1;
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 2;
 
     private Date date;
     private CharSequence charSequence;
 
     private ImageButton selectImage;
-
-    private EditText nameField;
-    private EditText descField;
-    private EditText additionalInfoField;
-    private Button submitBtn;
+    private EditText nameField, descField, additionalInfoField;
+    private Button submitBtn, locationBtn;
 
     private Uri imageUri = null;
     private StorageReference mStorage;
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabasePet;
+    private DatabaseReference mDatabasePetLocations;
     private ProgressDialog mProgress;
 
     private Spinner spinnerAge;
@@ -65,10 +79,10 @@ public class PetCreateActivity extends AppCompatActivity {
 
     private Switch switchCastrated, switchVaccinated, switchWormed;
 
-    private String[]health = null;
-    private final String[]size = null;
-    private final String[]species = null;
+    private AlertDialog.Builder builder = null;
 
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,15 +91,9 @@ public class PetCreateActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pet_create);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //rellenando dropdown'charSequence
-        String[]age = { getResources().getString(R.string.select_age), getResources().getString(R.string.select_age_puppy), getResources().getString(R.string.select_age_young), getResources().getString(R.string.select_age_adult), getResources().getString(R.string.select_age_old)};
-        String[]health = { getResources().getString(R.string.select_health), getResources().getString(R.string.select_health_bad), getResources().getString(R.string.select_health_ok), getResources().getString(R.string.select_health_good)};
-        String[]size = { getResources().getString(R.string.select_size), getResources().getString(R.string.select_size_small), getResources().getString(R.string.select_size_medium), getResources().getString(R.string.select_size_large)};
-        String[]species = { getResources().getString(R.string.select_species), getResources().getString(R.string.dog), getResources().getString(R.string.cat), getResources().getString(R.string.rabbit), getResources().getString(R.string.pig), getResources().getString(R.string.bird), getResources().getString(R.string.rodent), getResources().getString(R.string.other)};
-        String[]gender = { getResources().getString(R.string.select_gender), getResources().getString(R.string.male), getResources().getString(R.string.female)};
-
         mStorage = FirebaseStorage.getInstance().getReference();
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("pet");
+        mDatabasePet = FirebaseDatabase.getInstance().getReference().child("pet");
+        mDatabasePetLocations = FirebaseDatabase.getInstance().getReference().child("pet_locations");
 
         selectImage = (ImageButton) findViewById(R.id.selectImage);
         nameField = (EditText) findViewById(R.id.nameField);
@@ -97,14 +105,22 @@ public class PetCreateActivity extends AppCompatActivity {
         switchWormed = (Switch) findViewById(R.id.switchWormed);
 
         submitBtn = (Button) findViewById(R.id.submitBtn);
+        locationBtn = (Button) findViewById(R.id.locationBtn);
 
         mProgress = new ProgressDialog(this);
 
         spinnerAge = (Spinner) findViewById(R.id.spinnerAge);
-        spinnerHealth = (Spinner)findViewById(R.id.spinnerHealth);
+        spinnerHealth = (Spinner) findViewById(R.id.spinnerHealth);
         spinnerSize = (Spinner) findViewById(R.id.spinnerSize);
         spinnerSpecies = (Spinner) findViewById(R.id.spinnerSpecies);
         spinnerGender = (Spinner) findViewById(R.id.spinnerGender);
+
+        //dropdown's
+        String[] age = {getResources().getString(R.string.select_age), getResources().getString(R.string.select_age_puppy), getResources().getString(R.string.select_age_young), getResources().getString(R.string.select_age_adult), getResources().getString(R.string.select_age_old)};
+        String[] health = {getResources().getString(R.string.select_health), getResources().getString(R.string.select_health_bad), getResources().getString(R.string.select_health_ok), getResources().getString(R.string.select_health_good)};
+        String[] size = {getResources().getString(R.string.select_size), getResources().getString(R.string.select_size_small), getResources().getString(R.string.select_size_medium), getResources().getString(R.string.select_size_large)};
+        String[] species = {getResources().getString(R.string.select_species), getResources().getString(R.string.dog), getResources().getString(R.string.cat), getResources().getString(R.string.rabbit), getResources().getString(R.string.pig), getResources().getString(R.string.bird), getResources().getString(R.string.rodent), getResources().getString(R.string.other)};
+        String[] gender = {getResources().getString(R.string.select_gender), getResources().getString(R.string.male), getResources().getString(R.string.female)};
 
         final List<String> ageList = new ArrayList<>(Arrays.asList(age));
         final List<String> healthList = new ArrayList<>(Arrays.asList(health));
@@ -120,6 +136,10 @@ public class PetCreateActivity extends AppCompatActivity {
 
         date = new Date();
         charSequence = DateFormat.format("MMMM date, yyyy ", date.getTime());
+
+        //Google Play Services & Get the Last Known Location
+        buildGoogleApiClient();
+
 
         /*
         spinnerSpecies.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -147,53 +167,118 @@ public class PetCreateActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                //ADD IMG BTN
-                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT );
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, GALLERY_REQUEST);
+                //https://github.com/ArthurHub/Android-Image-Cropper/wiki/Pick-image-for-cropping-from-Camera-or-Gallery
+                startActivityForResult(CropImage.getPickImageChooserIntent(PetCreateActivity.this, getResources().getString(R.string.add_image_from), true), 200);
+
+                /*
+                //MODAL DE GALERÍA Y CÁMARA
+                View view = LayoutInflater.from(PetCreateActivity.this).inflate(R.layout.dialog_image, null);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(PetCreateActivity.this);
+                builder
+                        .setTitle(getResources().getString(R.string.add_image_from))
+                        .setView(view);
+                TextView textView_camera = (TextView) view.findViewById(R.id.textView_camera);
+                TextView textView_gallery = (TextView) view.findViewById(R.id.textView_gallery);
+                final AlertDialog alert = builder.show();
+
+                textView_camera.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        //camara
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+
+                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+                        }
+                        //Toast.makeText(PetCreateActivity.this, "Open camera", Toast.LENGTH_SHORT).show();
+                        alert.dismiss();
+
+                    }
+                });
+
+                textView_gallery.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        //galería
+                        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT );
+                        galleryIntent.setType("image/*");
+                        startActivityForResult(galleryIntent, GALLERY_REQUEST);
+                        alert.dismiss();
+
+                    }
+                });*/
 
             }
         });
+
+
 
         submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //SUBMIT BTN
                 startPosting();
+
+            }
+        });
+
+        locationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //Obtener nombre de ciudad
 
             }
         });
 
     }
 
+    public static Address getAddress(final Context context, final Location location) {
+        if (location == null)
+            return null;
+
+        final Geocoder geocoder = new Geocoder(context);
+        final List<Address> addresses;
+        try {
+            addresses = geocoder.getFromLocation(location.getLatitude(),
+                    location.getLongitude(), 1);
+        } catch (IOException e) {
+            return null;
+        }
+        if (addresses != null && !addresses.isEmpty())
+            return addresses.get(0);
+        else
+            return null;
+    }
+
     private void createDropdown(List<String> list, Spinner sniner) {
 
         final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
-                this,R.layout.spinner_item, list){
+                this, R.layout.spinner_item, list) {
             @Override
-            public boolean isEnabled(int position){
-                if(position == 0)
-                {
+            public boolean isEnabled(int position) {
+                if (position == 0) {
                     // Disable the first item from Spinner
                     // First item will be use for hint
                     return false;
-                }
-                else
-                {
+                } else {
                     return true;
                 }
             }
+
             @Override
             public View getDropDownView(int position, View convertView,
                                         ViewGroup parent) {
                 View view = super.getDropDownView(position, convertView, parent);
                 TextView tv = (TextView) view;
-                if(position == 0){
+                if (position == 0) {
                     // Set the hint text color gray
                     tv.setTextColor(Color.GRAY);
-                }
-                else {
+                } else {
                     tv.setTextColor(Color.BLACK);
                 }
                 return view;
@@ -239,45 +324,51 @@ public class PetCreateActivity extends AppCompatActivity {
             wormed_val = false;
         }
 
-        if (!TextUtils.isEmpty(name_val) && !TextUtils.isEmpty(desc_val) && imageUri != null ) {
+        if (!TextUtils.isEmpty(name_val) && !TextUtils.isEmpty(desc_val) && imageUri != null) {
 
             //StorageReference filepath = mStorage.child("Pet_Images").child(imageUri.getLastPathSegment());
             StorageReference filepath = mStorage.child("Pet_Images").child(random());
+
             filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
                     Uri donwloadUrl = taskSnapshot.getDownloadUrl();
-                    DatabaseReference newPet = mDatabase.push();
+
+                    GeoFire geoFirePet = new GeoFire(mDatabasePetLocations);
+                    DatabaseReference newPet = mDatabasePet.push();
 
                     newPet.child("description").setValue(desc_val);
                     newPet.child("image").setValue(donwloadUrl.toString());
                     newPet.child("name").setValue(nameField.getText().toString().trim());
                     newPet.child("info").setValue(additional_info_val);
-
                     newPet.child("age").setValue(age_val);
                     newPet.child("species").setValue(species_val);
                     newPet.child("gender").setValue(gender_val);
                     newPet.child("size").setValue(size_val);
                     newPet.child("health").setValue(health_val);
-
                     newPet.child("castrated").setValue(castrated_val);
                     newPet.child("vaccinated").setValue(vaccinated_val);
                     newPet.child("wormed").setValue(wormed_val);
+                    newPet.child("reports").setValue("0");
+                    newPet.child("modifiedDate").setValue(String.valueOf(charSequence));
+                    newPet.child("createdDate").setValue(String.valueOf(charSequence));
+                    newPet.child("adopted").setValue(false);
+                    newPet.child("active").setValue(true);
 
-                    //id_user
                     //newPet.child("uid").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
                     newPet.child("uid").setValue(1);
 
-                    newPet.child("reports").setValue("0");
-
-                    newPet.child("modifiedDate").setValue(String.valueOf(charSequence));
-                    newPet.child("createdDate").setValue(String.valueOf(charSequence));
-
-                    //Geofire
-                    newPet.child("ubication").setValue("10.323266, -84.431012");
-                    newPet.child("adopted").setValue(false);
-                    newPet.child("active").setValue(true);
+                    geoFirePet.setLocation(newPet.getKey(), new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new GeoFire.CompletionListener() {
+                        @Override
+                        public void onComplete(String key, DatabaseError error) {
+                            if (error != null) {
+                                System.err.println("There was an error saving the location to GeoFire: " + error);
+                            } else {
+                                System.out.println("Location saved on server successfully!");
+                            }
+                        }
+                    });
 
                     mProgress.dismiss();
                     Toast.makeText(PetCreateActivity.this, getResources().getString(R.string.saved), Toast.LENGTH_SHORT).show();
@@ -296,15 +387,14 @@ public class PetCreateActivity extends AppCompatActivity {
         StringBuilder randomStringBuilder = new StringBuilder();
         int randomLength = generator.nextInt(22);
         char tempChar;
-
-        for (int i = 0; i < randomLength; i++){
+        for (int i = 0; i < randomLength; i++) {
 
             tempChar = (char) (generator.nextInt(96) + 32);
             randomStringBuilder.append(tempChar);
 
         }
-
         return randomStringBuilder.toString();
+
     }
 
     @Override
@@ -312,32 +402,51 @@ public class PetCreateActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK) {
-
             imageUri = data.getData();
-            CropImage.activity(imageUri)
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(4,3)
-                    .start(this);
+
+            startCropImageActivity(imageUri);
+
+        }
+
+        //con el dialog
+        //requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK
+        //
+        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == this.RESULT_OK) {
+
+            //obtener bitmap desde la cámara
+            //Bundle extras = data.getExtras();
+            //Bitmap imageBitmap = (Bitmap) extras.get("data");
+            //Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+
+            //imageUri = getPickImageResultUri(data);
+            //getCaptureImageOutputUri() //https://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/
+            //imageUri = CropImage.getCaptureImageOutputUri(getApplicationContext());
+
+            imageUri = CropImage.getPickImageResultUri(this, data);
+            startCropImageActivity(imageUri);
 
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
-            //aqui imagen
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
-
             if (resultCode == RESULT_OK) {
 
                 imageUri = result.getUri();
                 selectImage.setImageURI(imageUri);
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-
                 Exception error = result.getError();
-
             }
         }
 
+    }
+
+    private void startCropImageActivity(Uri imageUri) {
+        CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setAspectRatio(4, 3)
+                .start(this);
     }
 
     @Override
@@ -351,6 +460,74 @@ public class PetCreateActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+
+        if (mLastLocation != null) {
+            Log.i("Latitude", String.valueOf(mLastLocation.getLatitude()));
+            Log.i("Longitude", String.valueOf(mLastLocation.getLongitude()));
+
+            /*
+            final Geocoder geocoder = new Geocoder(getApplicationContext());
+            final List<Address> addresses;
+            try {
+                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(),
+                        mLastLocation.getLongitude(), 1);
+            } catch (IOException e) {
+
+
+            }
+            if (addresses != null && !addresses.isEmpty()) {
+                locationBtn.setText(String.valueOf(addresses.get(0)));
+            }
+            */
+
+        } else {
+            Log.i("LOCATION PROBLEM", " --> null");
+        }
+
+    }
+
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Toast.makeText(this, "Connection suspended...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, "Failed to connect...", Toast.LENGTH_SHORT).show();
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
     }
 
 }

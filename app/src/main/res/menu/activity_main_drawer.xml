@@ -15,10 +15,11 @@
             android:id="@+id/nav_animal_shelters"
             android:icon="@mipmap/ic_shelters_black_24dp"
             android:title="@string/animal_shelters" />
-        <item
-            android:id="@+id/nav_stray_animal"
-            android:icon="@mipmap/ic_report_black_24dp"
-            android:title="@string/stray_animal" />
+        <!--<item-->
+            <!--android:id="@+id/nav_stray_animal"-->
+            <!--android:icon="@mipmap/ic_report_black_24dp"-->
+            <!--android:title="@string/stray_animal" />-->
+
         <item android:title="App">
             <menu>
                 <item

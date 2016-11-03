@@ -30,7 +30,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/animalDesc"
             android:text="Description"
-            android:padding="10dp" />
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:paddingBottom="10dp" />
 
     </LinearLayout>
 

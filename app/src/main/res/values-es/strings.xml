@@ -6,13 +6,16 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Configuración</string>
+    <string name="action_settings">Ajustes</string>
     <string name="sing_out">Salir</string>
     <string name="animals">Animales</string>
     <string name="vets">Veterinarias</string>
     <string name="animal_shelters">Refugios</string>
     <string name="stray_animal">Animales extraviados</string>
-    <string name="nav_map">Mapa</string>
+
+    <string id="add_image_from" name="add_image_from">Agregar imagen desde</string>
+    <string id="camera" name="camera">Camara</string>
+    <string id="gallery" name="gallery">Galería</string>
 
     <string name="title_activity_pet_index">Animales</string>
     <string name="title_activity_pet_create">Agregando un animal</string>

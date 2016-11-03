@@ -27,8 +27,7 @@
             android:layout_height="wrap_content"
             app:srcCompat="@mipmap/add_btn"
             android:id="@+id/selectImage"
-            android:backgroundTint="@color/cardview_shadow_end_color"
-            android:background="#00ffffff"
+            android:background="@drawable/input_outline"
             android:src="@mipmap/add_btn"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true" />
@@ -44,7 +43,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
+            android:inputType="textCapWords"
             android:ems="10"
             android:padding="15dp"
             android:background="@drawable/input_outline"
@@ -142,6 +141,18 @@
             android:layout_marginBottom="20dp" />
 
         <Button
+            android:text="Save you location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/locationBtn"
+            android:background="@drawable/input_outline"
+            android:textColor="@color/common_google_signin_btn_text_light_default"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="30dp"/>
+
+        <Button
             android:text="@string/submitBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -156,6 +167,5 @@
     </LinearLayout>
 
     </ScrollView>
-
 
 </RelativeLayout>

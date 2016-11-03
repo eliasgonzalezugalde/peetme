@@ -12,7 +12,10 @@
     <string name="vets">Vets</string>
     <string name="animal_shelters">Animal shelters</string>
     <string name="stray_animal">Stray animals</string>
-    <string name="nav_map">Map</string>
+
+    <string id="add_image_from" name="add_image_from">Add image from</string>
+    <string id="camera" name="camera">Camera</string>
+    <string id="gallery" name="gallery">Gallery</string>
 
     <string name="title_activity_pet_index">Animals</string>
     <string name="title_activity_pet_create">Adding an animal</string>
