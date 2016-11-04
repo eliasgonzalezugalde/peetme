@@ -32,29 +32,23 @@
     <string name="saving" id="saving">Saving</string>
     <string name="saved" id="saved">Animal successfully saved</string>
 
+    <string name="species" id="species">Species</string>
+    <string name="name_hint" id="name_hint">If no name, give one</string>
     <string name="name">Name</string>
+    <string name="description_hitn" id="description_hitn">e.g It is playful, funny, loyal</string>
     <string name="description">Description</string>
     <string name="breed">Breed</string>
-    <string name="select_gender" id="select_gender">Select gender</string>
-    <string name="female" id="female">Female</string>
-    <string name="male" id="male">Male</string>
     <string name="age">Age</string>
+    <string name="gender">Gender</string>
     <string name="size" id="size">Size</string>
     <string name="health" id="health">Health</string>
+    <string name="castrated" id="castrated">Castrated</string>
+    <string name="wormed" id="wormed">Wormed</string>
+    <string name="vaccinated" id="vaccinated">Vaccinated</string>
+    <string name="additionalInfo">Additional info</string>
+    <string name="additionalInfo_hint">e.g I found it about 5 days ago</string>
+    <string name="select" id="select">Select an option</string>
 
-    <string name="select_size" id="select_size">Select size</string>
-    <string name="select_size_small" id="select_size_small">Small</string>
-    <string name="select_size_medium" id="select_size_medium">Medium</string>
-    <string name="select_size_large" id="select_size_large">Large</string>
-
-    <string name="select_age" id="select_age">Select age</string>
-    <string name="select_age_puppy" id="select_age_puppy">Puppy</string>
-    <string name="select_age_young" id="select_age_young">Young</string>
-    <string name="select_age_adult" id="select_age_adult">Adult</string>
-    <string name="select_age_old" id="select_age_old">Old</string>
-
-    <string name="select_species" id="select_species">Select species</string>
-    <string name="species" id="species">Species</string>
     <string name="dog" id="dog">Dog</string>
     <string name="cat" id="cat">Cat</string>
     <string name="rabbit" id="rabbit">Rabbit</string>
@@ -63,16 +57,26 @@
     <string name="rodent" id="rodent">Rodent</string>
     <string name="other" id="other">Other</string>
 
-    <string name="castrated" id="castrated">Castrated</string>
-    <string name="wormed" id="wormed">Wormed</string>
-    <string name="vaccinated" id="vaccinated">Vaccinated</string>
+    <string name="select_age_puppy" id="select_age_puppy">Puppy</string>
+    <string name="select_age_young" id="select_age_young">Young</string>
+    <string name="select_age_adult" id="select_age_adult">Adult</string>
+    <string name="select_age_old" id="select_age_old">Old</string>
 
-    <string name="select_health">Select health</string>
+    <string name="female" id="female">Female</string>
+    <string name="male" id="male">Male</string>
+
+    <string name="select_size_small" id="select_size_small">Small</string>
+    <string name="select_size_medium" id="select_size_medium">Medium</string>
+    <string name="select_size_large" id="select_size_large">Large</string>
+
     <string name="select_health_bad">Bad</string>
-    <string name="select_health_ok">OK</string>
+    <string name="select_health_ok">Regular</string>
     <string name="select_health_good">Good</string>
 
-    <string name="additionalInfo">Additional info</string>
+    <string name="locationBtn">Save your current location</string>
+    <string name="location">Location</string>
+    <string name="done" id="done">Location saved</string>
     <string name="submitBtn">Submit</string>
+    <string name="validation" id="validation">Please check the fields and try to send the form again</string>
 
 </resources>

@@ -34,6 +34,7 @@ public class PetIndexActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
+
         super.onStart();
 
         FirebaseRecyclerAdapter<Pet, PetViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Pet, PetViewHolder>(

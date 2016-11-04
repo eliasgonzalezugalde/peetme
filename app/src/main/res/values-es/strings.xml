@@ -32,29 +32,23 @@
     <string id="saving" name="saving">Guardando</string>
     <string id="saved" name="saved">Animal guardado exitosamente</string>
 
+    <string id="species" name="species">Especie</string>
+    <string name="name_hint" id="name_hint">Si no tiene nombre, dale uno</string>
     <string name="name">Nombre</string>
+    <string name="description_hitn" id="description_hitn">Ej: Es juguetón, divertido, leal</string>
     <string name="description">Descripción</string>
     <string name="breed">Raza</string>
-    <string id="select_gender" name="select_gender">Seleccione el género</string>
-    <string id="female" name="female">Femenino</string>
-    <string id="male" name="male">Masculino</string>
     <string name="age">Edad</string>
+    <string name="gender">Género</string>
     <string id="size" name="size">Tamaño</string>
     <string id="health" name="health">Salud</string>
+    <string id="castrated" name="castrated">Castrado</string>
+    <string id="wormed" name="wormed">Desparacitado</string>
+    <string id="vaccinated" name="vaccinated">Vacunado</string>
+    <string name="additionalInfo">Información adicional</string>
+    <string name="additionalInfo_hint">Ej: Lo encontré hace 5 días</string>
+    <string name="select" id="select">Escoge una opción</string>
 
-    <string id="select_size" name="select_size">Seleccione el tamaño</string>
-    <string id="select_size_small" name="select_size_small">Pequeño</string>
-    <string id="select_size_medium" name="select_size_medium">Mediano</string>
-    <string id="select_size_large" name="select_size_large">Grande</string>
-
-    <string id="select_age" name="select_age">Seleccione la edad</string>
-    <string id="select_age_puppy" name="select_age_puppy">Cachorro</string>
-    <string id="select_age_young" name="select_age_young">Joven</string>
-    <string id="select_age_adult" name="select_age_adult">Adulto</string>
-    <string id="select_age_old" name="select_age_old">Viejo</string>
-
-    <string id="select_species" name="select_species">Seleccione la especie</string>
-    <string id="species" name="species">Especie</string>
     <string id="dog" name="dog">Perro</string>
     <string id="cat" name="cat">Gato</string>
     <string id="rabbit" name="rabbit">Conejo</string>
@@ -63,16 +57,26 @@
     <string id="rodent" name="rodent">Roedor</string>
     <string id="other" name="other">Otro</string>
 
-    <string id="castrated" name="castrated">Castrado</string>
-    <string id="wormed" name="wormed">Desparacitado</string>
-    <string id="vaccinated" name="vaccinated">Vacunado</string>
+    <string id="select_age_puppy" name="select_age_puppy">Cachorro</string>
+    <string id="select_age_young" name="select_age_young">Joven</string>
+    <string id="select_age_adult" name="select_age_adult">Adulto</string>
+    <string id="select_age_old" name="select_age_old">Viejo</string>
 
-    <string name="select_health">Seleccione la salud</string>
+    <string id="female" name="female">Femenino</string>
+    <string id="male" name="male">Masculino</string>
+
+    <string id="select_size_small" name="select_size_small">Pequeño</string>
+    <string id="select_size_medium" name="select_size_medium">Mediano</string>
+    <string id="select_size_large" name="select_size_large">Grande</string>
+
     <string name="select_health_bad">Mala</string>
     <string name="select_health_ok">Regular</string>
     <string name="select_health_good">Buena</string>
 
-    <string name="additionalInfo">Información adicional</string>
+    <string name="locationBtn">Guardar ubicación actual</string>
+    <string name="location">Ubicación</string>
+    <string name="done" id="done">Ubicación guardada</string>
     <string name="submitBtn">Guardar</string>
+    <string name="validation" id="validation">Por favor confirme los campos e intente enviar de nuevo el formulario</string>
 
 </resources>

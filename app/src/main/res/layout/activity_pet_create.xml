@@ -30,7 +30,16 @@
             android:background="@drawable/input_outline"
             android:src="@mipmap/add_btn"
             android:scaleType="centerCrop"
+            android:layout_marginBottom="20dp"
             android:adjustViewBounds="true" />
+
+        <TextView
+            android:text="@string/species"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewSpecies"
+            android:textColor="@color/textViewColor"
+            android:textSize="20dp"/>
 
         <Spinner
             android:id="@+id/spinnerSpecies"
@@ -40,56 +49,113 @@
             android:layout_marginBottom="20dp"
             android:background="@drawable/input_outline" />
 
+        <TextView
+            android:text="@string/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewName"
+            android:textColor="@color/textViewColor"
+            android:textSize="20dp"/>
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textCapWords"
             android:ems="10"
             android:padding="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/input_outline"
             android:id="@+id/nameField"
-            android:hint="@string/name"
+            android:hint="@string/name_hint"
+            android:textColorHint="@color/hintColor"
             android:maxLines="1" />
+
+        <TextView
+            android:text="@string/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewDescription"
+            android:textColor="@color/textViewColor"
+            android:textSize="20dp"/>
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
             android:ems="10"
-            android:padding="15dp"
+            android:padding="10dp"
             android:background="@drawable/input_outline"
             android:layout_below="@+id/nameField"
             android:layout_centerHorizontal="true"
             android:id="@+id/descField"
-            android:layout_marginTop="20dp"
-            android:hint="@string/description" />
+            android:textColorHint="@color/hintColor"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:hint="@string/description_hitn" />
+
+        <TextView
+            android:text="@string/age"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewAge"
+            android:textColor="@color/textViewColor"
+            android:textSize="20dp"/>
 
         <Spinner
             android:id="@+id/spinnerAge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/input_outline" />
+
+        <TextView
+            android:text="@string/gender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewGender"
+            android:textColor="@color/textViewColor"
+            android:textSize="20dp"/>
 
         <Spinner
             android:id="@+id/spinnerGender"
             android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
             android:layout_height="wrap_content"
             android:background="@drawable/input_outline" />
+
+        <TextView
+            android:text="@string/size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewSize"
+            android:textColor="@color/textViewColor"
+            android:textSize="20dp"/>
 
         <Spinner
             android:id="@+id/spinnerSize"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/input_outline" />
+
+        <TextView
+            android:text="@string/health"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewHealth"
+            android:textColor="@color/textViewColor"
+            android:textSize="20dp"/>
 
         <Spinner
             android:id="@+id/spinnerHealth"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/input_outline" />
 
         <Switch
@@ -103,7 +169,7 @@
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:checked="false"
-            android:textColor="@color/common_google_signin_btn_text_light_default" />
+            android:textColor="@color/textViewColor" />
 
         <Switch
             android:layout_marginTop="20dp"
@@ -115,7 +181,7 @@
             android:textSize="18dp"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:textColor="@color/common_google_signin_btn_text_light_default" />
+            android:textColor="@color/textViewColor" />
 
         <Switch
             android:layout_marginTop="20dp"
@@ -127,7 +193,16 @@
             android:textSize="18dp"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:textColor="@color/common_google_signin_btn_text_light_default" />
+            android:textColor="@color/textViewColor" />
+
+        <TextView
+            android:layout_marginTop="20dp"
+            android:text="@string/additionalInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewAdditionalInfo"
+            android:textColor="@color/textViewColor"
+            android:textSize="20dp"/>
 
         <EditText
             android:layout_width="match_parent"
@@ -136,12 +211,21 @@
             android:padding="15dp"
             android:background="@drawable/input_outline"
             android:id="@+id/additionalInfoField"
-            android:hint="@string/additionalInfo"
+            android:hint="@string/additionalInfo_hint"
+            android:textColorHint="@color/hintColor"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp" />
 
+        <TextView
+            android:text="@string/location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewLocation"
+            android:textColor="@color/textViewColor"
+            android:textSize="20dp"/>
+
         <Button
-            android:text="Save you location"
+            android:text="@string/locationBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/locationBtn"
@@ -150,7 +234,17 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_marginBottom="30dp"/>
+            android:layout_marginTop="10dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewLocationResult"
+            android:textColor="@color/hintColor"
+            android:padding="10dp"
+            android:layout_marginTop="10dp"
+            android:textSize="18dp"/>
 
         <Button
             android:text="@string/submitBtn"
@@ -162,6 +256,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_marginTop="30dp"
             android:layout_marginBottom="30dp"/>
 
     </LinearLayout>

@@ -61,6 +61,7 @@ public class PetCreateActivity extends AppCompatActivity implements
     private Date date;
     private CharSequence charSequence;
 
+    private TextView textViewLocationResult;
     private ImageButton selectImage;
     private EditText nameField, descField, additionalInfoField;
     private Button submitBtn, locationBtn;
@@ -95,6 +96,7 @@ public class PetCreateActivity extends AppCompatActivity implements
         mDatabasePet = FirebaseDatabase.getInstance().getReference().child("pet");
         mDatabasePetLocations = FirebaseDatabase.getInstance().getReference().child("pet_locations");
 
+        textViewLocationResult = (TextView) findViewById(R.id.textViewLocationResult);
         selectImage = (ImageButton) findViewById(R.id.selectImage);
         nameField = (EditText) findViewById(R.id.nameField);
         descField = (EditText) findViewById(R.id.descField);
@@ -116,11 +118,11 @@ public class PetCreateActivity extends AppCompatActivity implements
         spinnerGender = (Spinner) findViewById(R.id.spinnerGender);
 
         //dropdown's
-        String[] age = {getResources().getString(R.string.select_age), getResources().getString(R.string.select_age_puppy), getResources().getString(R.string.select_age_young), getResources().getString(R.string.select_age_adult), getResources().getString(R.string.select_age_old)};
-        String[] health = {getResources().getString(R.string.select_health), getResources().getString(R.string.select_health_bad), getResources().getString(R.string.select_health_ok), getResources().getString(R.string.select_health_good)};
-        String[] size = {getResources().getString(R.string.select_size), getResources().getString(R.string.select_size_small), getResources().getString(R.string.select_size_medium), getResources().getString(R.string.select_size_large)};
-        String[] species = {getResources().getString(R.string.select_species), getResources().getString(R.string.dog), getResources().getString(R.string.cat), getResources().getString(R.string.rabbit), getResources().getString(R.string.pig), getResources().getString(R.string.bird), getResources().getString(R.string.rodent), getResources().getString(R.string.other)};
-        String[] gender = {getResources().getString(R.string.select_gender), getResources().getString(R.string.male), getResources().getString(R.string.female)};
+        String[] age = {getResources().getString(R.string.select), getResources().getString(R.string.select_age_puppy), getResources().getString(R.string.select_age_young), getResources().getString(R.string.select_age_adult), getResources().getString(R.string.select_age_old)};
+        String[] health = {getResources().getString(R.string.select), getResources().getString(R.string.select_health_bad), getResources().getString(R.string.select_health_ok), getResources().getString(R.string.select_health_good)};
+        String[] size = {getResources().getString(R.string.select), getResources().getString(R.string.select_size_small), getResources().getString(R.string.select_size_medium), getResources().getString(R.string.select_size_large)};
+        String[] species = {getResources().getString(R.string.select), getResources().getString(R.string.dog), getResources().getString(R.string.cat), getResources().getString(R.string.rabbit), getResources().getString(R.string.pig), getResources().getString(R.string.bird), getResources().getString(R.string.rodent), getResources().getString(R.string.other)};
+        String[] gender = {getResources().getString(R.string.select), getResources().getString(R.string.male), getResources().getString(R.string.female)};
 
         final List<String> ageList = new ArrayList<>(Arrays.asList(age));
         final List<String> healthList = new ArrayList<>(Arrays.asList(health));
@@ -135,7 +137,7 @@ public class PetCreateActivity extends AppCompatActivity implements
         createDropdown(genderList, spinnerGender);
 
         date = new Date();
-        charSequence = DateFormat.format("MMMM date, yyyy ", date.getTime());
+        charSequence = DateFormat.format("dd/MM/yyyy", date.getTime());
 
         //Google Play Services & Get the Last Known Location
         buildGoogleApiClient();
@@ -216,7 +218,6 @@ public class PetCreateActivity extends AppCompatActivity implements
         });
 
 
-
         submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -230,10 +231,21 @@ public class PetCreateActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
 
-                //Obtener nombre de ciudad
+                if (mLastLocation != null) {
+                    locationBtn.setText(getResources().getString(R.string.done));
+                    locationBtn.setEnabled(false);
+                    //locationBtn.setTransformationMethod(null); //boton en minusculas
+                    textViewLocationResult.setText(String.valueOf(getAddress(PetCreateActivity.this, mLastLocation).getAddressLine(0)));
+                    textViewLocationResult.setVisibility(View.VISIBLE);
+                    Log.i("GET ADDRESS", String.valueOf(getAddress(PetCreateActivity.this, mLastLocation).getAddressLine(0)) + "n/" + String.valueOf(getAddress(PetCreateActivity.this, mLastLocation).getAddressLine(1)));
+                } else {
+                    Log.i("", "NULL");
+                }
 
             }
         });
+
+        textViewLocationResult.setVisibility(View.GONE);
 
     }
 
@@ -293,6 +305,7 @@ public class PetCreateActivity extends AppCompatActivity implements
     private void startPosting() {
         mProgress.setMessage(getResources().getString(R.string.saving) + " ...");
         mProgress.show();
+        mProgress.setCancelable(false);
 
         final String name_val = nameField.getText().toString().trim();
         final String desc_val = descField.getText().toString().trim();
@@ -300,9 +313,9 @@ public class PetCreateActivity extends AppCompatActivity implements
 
         final String age_val = spinnerAge.getSelectedItem().toString().trim();
         final String species_val = spinnerSpecies.getSelectedItem().toString().trim();
-        final String gender_val = spinnerSpecies.getSelectedItem().toString().trim();
-        final String size_val = spinnerSpecies.getSelectedItem().toString().trim();
-        final String health_val = spinnerSpecies.getSelectedItem().toString().trim();
+        final String gender_val = spinnerGender.getSelectedItem().toString().trim();
+        final String size_val = spinnerSize.getSelectedItem().toString().trim();
+        final String health_val = spinnerHealth.getSelectedItem().toString().trim();
 
         final boolean castrated_val;
         final boolean vaccinated_val;
@@ -324,7 +337,20 @@ public class PetCreateActivity extends AppCompatActivity implements
             wormed_val = false;
         }
 
-        if (!TextUtils.isEmpty(name_val) && !TextUtils.isEmpty(desc_val) && imageUri != null) {
+        if (!TextUtils.isEmpty(name_val)
+                && !TextUtils.isEmpty(desc_val)
+                && imageUri != null
+                //&& !TextUtils.isEmpty(additional_info_val)
+                && !TextUtils.isEmpty(age_val)
+                && spinnerAge.getSelectedItemPosition() != 0
+                && !TextUtils.isEmpty(species_val)
+                && spinnerSpecies.getSelectedItemPosition() != 0
+                && !TextUtils.isEmpty(gender_val)
+                && spinnerGender.getSelectedItemPosition() != 0
+                && !TextUtils.isEmpty(size_val)
+                && spinnerSize.getSelectedItemPosition() != 0
+                && !TextUtils.isEmpty(health_val)
+                && spinnerHealth.getSelectedItemPosition() != 0) {
 
             //StorageReference filepath = mStorage.child("Pet_Images").child(imageUri.getLastPathSegment());
             StorageReference filepath = mStorage.child("Pet_Images").child(random());
@@ -338,18 +364,18 @@ public class PetCreateActivity extends AppCompatActivity implements
                     GeoFire geoFirePet = new GeoFire(mDatabasePetLocations);
                     DatabaseReference newPet = mDatabasePet.push();
 
-                    newPet.child("description").setValue(desc_val);
                     newPet.child("image").setValue(donwloadUrl.toString());
-                    newPet.child("name").setValue(nameField.getText().toString().trim());
-                    newPet.child("info").setValue(additional_info_val);
-                    newPet.child("age").setValue(age_val);
                     newPet.child("species").setValue(species_val);
+                    newPet.child("name").setValue(nameField.getText().toString().trim());
+                    newPet.child("description").setValue(desc_val);
+                    newPet.child("age").setValue(age_val);
                     newPet.child("gender").setValue(gender_val);
                     newPet.child("size").setValue(size_val);
                     newPet.child("health").setValue(health_val);
                     newPet.child("castrated").setValue(castrated_val);
                     newPet.child("vaccinated").setValue(vaccinated_val);
                     newPet.child("wormed").setValue(wormed_val);
+                    newPet.child("info").setValue(additional_info_val);
                     newPet.child("reports").setValue("0");
                     newPet.child("modifiedDate").setValue(String.valueOf(charSequence));
                     newPet.child("createdDate").setValue(String.valueOf(charSequence));
@@ -371,12 +397,16 @@ public class PetCreateActivity extends AppCompatActivity implements
                     });
 
                     mProgress.dismiss();
+                    finish();
                     Toast.makeText(PetCreateActivity.this, getResources().getString(R.string.saved), Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(PetCreateActivity.this, PetIndexActivity.class));
 
                 }
             });
 
+        } else {
+            mProgress.dismiss();
+            Toast.makeText(PetCreateActivity.this, getResources().getString(R.string.validation), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -450,23 +480,9 @@ public class PetCreateActivity extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
-
-    @Override
     public void onConnected(@Nullable Bundle bundle) {
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
             return;
         }
 
@@ -528,6 +544,19 @@ public class PetCreateActivity extends AppCompatActivity implements
                     .addApi(LocationServices.API)
                     .build();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 
 }
