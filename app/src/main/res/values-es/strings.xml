@@ -1,7 +1,10 @@
 <resources>
+
     <string name="app_name">Peetme</string>
     <string name="title_activity_animal_maps">Map</string>
     <string name="title_activity_main">Peetme</string>
+    <string id="firebase_error_login" name="firebase_error_login">Error entrando</string>
+    <string id="login_normal_account" name="login_normal_account">No, iniciar con una cuenta normal</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

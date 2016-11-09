@@ -1,19 +1,32 @@
 package peetme.app.trunimal.com.peetme;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.Manifest;
+import android.widget.Toast;
 
+import com.fastaccess.permission.base.PermissionHelper;
+import com.fastaccess.permission.base.callback.OnPermissionCallback;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -21,19 +34,25 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnPermissionCallback {
 
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
+    final String PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
+    PermissionHelper permissionHelper;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -46,7 +65,34 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+                if (firebaseAuth.getCurrentUser() == null) {
+                    startActivity(new Intent(MainActivity.this, LoginWithActivity.class));
+                }
+
+            }
+        };
+
         mapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map));
+
+        permissionHelper = PermissionHelper.getInstance(this);
+        permissionHelper.setForceAccepting(false).request(PERMISSION);
+
+        //Google Play Services & Get the Last Known Location
+        buildGoogleApiClient();
+
+    }
+
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        mAuth.addAuthStateListener(mAuthListener);
+        super.onStart();
+
         if (mapFragment != null) {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
@@ -80,6 +126,22 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
     }
 
     @Override
@@ -140,9 +202,12 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_sing_out) {
 
+            /*
             moveTaskToBack(true);
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(1);
+            */
+            mAuth.signOut();
 
         }/* else {
             return super.onOptionsItemSelected(item);
@@ -150,5 +215,81 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return false; //highlight
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        } else {
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+
+            if (mLastLocation != null) {
+                Log.i("Latitude", String.valueOf(mLastLocation.getLatitude()));
+                Log.i("Longitude", String.valueOf(mLastLocation.getLongitude()));
+            } else {
+                Log.i("LOCATION PROBLEM", " --> NULL");
+            }
+        }
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Toast.makeText(this, "Connection suspended...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, "Failed to connect...", Toast.LENGTH_SHORT).show();
+    }
+
+    //////////////////////////////////////////////////////////PERMISOS/////////////////////////////////////////////////////////////
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onPermissionGranted(@NonNull String[] permissionName) {
+
+    }
+
+    @Override
+    public void onPermissionDeclined(@NonNull String[] permissionName) {
+
+    }
+
+    @Override
+    public void onPermissionPreGranted(@NonNull String permissionsName) {
+
+    }
+
+    @Override
+    public void onPermissionNeedExplanation(@NonNull String permissionName) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("We need your help")
+                .setMessage("We use your location to show animal shelters or veterinary who are near you.")
+                .setPositiveButton("Request", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        permissionHelper.requestAfterExplanation(PERMISSION);
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    @Override
+    public void onPermissionReallyDeclined(@NonNull String permissionName) {
+
+    }
+
+    @Override
+    public void onNoPermissionNeeded() {
+
     }
 }

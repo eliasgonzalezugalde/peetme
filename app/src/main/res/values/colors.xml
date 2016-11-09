@@ -5,6 +5,7 @@
     <color name="colorAccent">#D12B1B</color>
     <color name="grayColor">#C2C2C2</color>
     <color name="hintColor">#C2C2C2</color>
+    <color name="f1f1f1">#f1f1f1</color>
     <color name="textViewColor">#707070</color>
     <color name="whiteColor">#FFFFFF</color>
 </resources>

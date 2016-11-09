@@ -509,7 +509,7 @@ public class PetCreateActivity extends AppCompatActivity implements
             */
 
         } else {
-            Log.i("LOCATION PROBLEM", " --> null");
+            Log.i("LOCATION PROBLEM", " --> NULL");
         }
 
     }
