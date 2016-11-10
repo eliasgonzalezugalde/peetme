@@ -6,6 +6,13 @@
     <string id="firebase_error_login" name="firebase_error_login">Error entrando</string>
     <string id="login_normal_account" name="login_normal_account">No, iniciar con una cuenta normal</string>
 
+    <string name="text_login" id="text_login">Si ya tienes una cuenta, solamente ingresa, si no es así, presiona el botón de registro</string>
+    <string name="log_in" id="log_in">Iniciar sesión</string>
+    <string name="register" id="register">Registrarse</string>
+    <string name="create_account" id="create_account">Crear nueva cuenta</string>
+    <string name="password" id="password">Contraseña</string>
+    <string name="email" id="email">Email</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 

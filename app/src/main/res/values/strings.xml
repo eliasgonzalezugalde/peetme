@@ -4,7 +4,14 @@
     <string name="title_activity_animal_maps">Map</string>
     <string name="title_activity_main">Peetme</string>
     <string name="firebase_error_login" id="firebase_error_login">Error login</string>
-    <string id="login_normal_account" name="login_normal_account">No, start with a normal account</string>
+    <string name="login_normal_account" id="login_normal_account">No, start with a normal account</string>
+
+    <string name="text_login" id="text_login">If you already have an account, just Log In, if not press the register button</string>
+    <string name="log_in" id="log_in">Log In</string>
+    <string name="register" id="register">Register</string>
+    <string name="create_account" id="create_account">Create new account</string>
+    <string name="password" id="password">Password</string>
+    <string name="email" id="email">Email</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

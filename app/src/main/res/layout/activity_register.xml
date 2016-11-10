@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_register"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="peetme.app.trunimal.com.peetme.RegisterActivity"
+    android:background="@color/f1f1f1">
+
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="105dp"
+        android:layout_height="125dp"
+        android:layout_gravity="center"
+        app:srcCompat="@drawable/logo" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="@string/name"
+        android:ems="10"
+        android:padding="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/input_outline"
+        android:id="@+id/nameField" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:hint="@string/email"
+        android:fontFamily="sans-serif"
+        android:layout_marginTop="20dp"
+        android:id="@+id/emailField"
+        android:padding="15dp"
+        android:background="@drawable/input_outline" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:hint="@string/password"
+        android:id="@+id/passwordField"
+        android:layout_marginTop="20dp"
+        android:padding="15dp"
+        android:background="@drawable/input_outline" />
+
+    <Button
+        android:background="@drawable/btn_background"
+        android:textColor="@color/whiteColor"
+        android:text="@string/create_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button2"
+        android:layout_below="@+id/editText2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
+</LinearLayout>

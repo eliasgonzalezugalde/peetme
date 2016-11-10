@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/googleBtn"
         android:layout_marginTop="15dp"
+        android:textAlignment="center"
         />
 
     <com.facebook.login.widget.LoginButton
@@ -34,9 +35,9 @@
         android:layout_height="wrap_content"
         android:text="connect_with_facebook"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="30dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
+        android:paddingLeft="12dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"/>
 
@@ -47,7 +48,8 @@
         android:id="@+id/normalAcount"
         android:textColor="@color/hintColor"
         android:textAlignment="center"
-        android:layout_weight="0.25" />
+        android:layout_marginTop="10dp"
+        android:padding="10dp"/>
     
     <ProgressBar
         android:id="@+id/progressBar"
