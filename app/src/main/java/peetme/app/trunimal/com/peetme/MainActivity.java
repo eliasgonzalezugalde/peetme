@@ -20,8 +20,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.Manifest;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
 import com.fastaccess.permission.base.PermissionHelper;
 import com.fastaccess.permission.base.callback.OnPermissionCallback;
 import com.google.android.gms.common.ConnectionResult;
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity
     PermissionHelper permissionHelper;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private TextView emailTextView, nameTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +68,9 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View hView =  navigationView.getHeaderView(0);
+        emailTextView = (TextView)hView.findViewById(R.id.emailTextView);
+        nameTextView = (TextView)hView.findViewById(R.id.nameTextView);
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -72,6 +79,9 @@ public class MainActivity extends AppCompatActivity
 
                 if (firebaseAuth.getCurrentUser() == null) {
                     startActivity(new Intent(MainActivity.this, LoginWithActivity.class));
+                } else {
+                    emailTextView.setText(firebaseAuth.getCurrentUser().getEmail());
+                    nameTextView.setText(firebaseAuth.getCurrentUser().getDisplayName());
                 }
 
             }
@@ -207,7 +217,10 @@ public class MainActivity extends AppCompatActivity
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(1);
             */
-            mAuth.signOut();
+            //mAuth.signOut();
+            FirebaseAuth.getInstance().signOut();
+            LoginManager.getInstance().logOut();
+            goLoginActivity();
 
         }/* else {
             return super.onOptionsItemSelected(item);
@@ -215,6 +228,12 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return false; //highlight
+    }
+
+    private void goLoginActivity() {
+        Intent intent = new Intent(MainActivity.this, LoginWithActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override

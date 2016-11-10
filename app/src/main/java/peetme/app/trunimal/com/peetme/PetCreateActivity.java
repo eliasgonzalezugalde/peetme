@@ -82,8 +82,8 @@ public class PetCreateActivity extends AppCompatActivity implements
 
     private AlertDialog.Builder builder = null;
 
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +95,8 @@ public class PetCreateActivity extends AppCompatActivity implements
         mStorage = FirebaseStorage.getInstance().getReference();
         mDatabasePet = FirebaseDatabase.getInstance().getReference().child("pet");
         mDatabasePetLocations = FirebaseDatabase.getInstance().getReference().child("pet_locations");
+        mDatabasePet.keepSynced(true);
+        mDatabasePetLocations.keepSynced(true);
 
         textViewLocationResult = (TextView) findViewById(R.id.textViewLocationResult);
         selectImage = (ImageButton) findViewById(R.id.selectImage);

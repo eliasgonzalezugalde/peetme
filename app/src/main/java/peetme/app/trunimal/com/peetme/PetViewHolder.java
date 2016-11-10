@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -37,10 +39,21 @@ public class PetViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void setImage(Context ctx, String image) {
+    public void setImage(final Context ctx, final String image) {
 
-        ImageView animalImage = (ImageView)mView.findViewById(R.id.animalImage);
-        Picasso.with(ctx).load(image).into(animalImage);
+        final ImageView animalImage = (ImageView)mView.findViewById(R.id.animalImage);
+        //
+        Picasso.with(ctx).load(image).networkPolicy(NetworkPolicy.OFFLINE).into(animalImage, new Callback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError() {
+                Picasso.with(ctx).load(image).into(animalImage);
+            }
+        });
 
     }
 
