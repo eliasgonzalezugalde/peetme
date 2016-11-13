@@ -144,6 +144,8 @@ public class PetCreateActivity extends AppCompatActivity implements
         //Google Play Services & Get the Last Known Location
         buildGoogleApiClient();
 
+        Log.i("GEO",String.valueOf(mDatabasePetLocations));
+
 
         /*
         spinnerSpecies.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
