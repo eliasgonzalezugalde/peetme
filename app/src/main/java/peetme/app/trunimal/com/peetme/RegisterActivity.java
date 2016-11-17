@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -36,14 +37,11 @@ public class RegisterActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
-
         nameField = (EditText) findViewById(R.id.nameField);
         emailField = (EditText) findViewById(R.id.emailField);
         passwordField = (EditText) findViewById(R.id.passwordField);
         registerBtn = (Button) findViewById(R.id.registerBtn);
         mProgress = new ProgressDialog(this);
-
-
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,49 +53,47 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void startRegister() {
 
-        final String name = nameField.getText().toString().trim();
-        String email = emailField .getText().toString().trim();
-        Log.e(TAG, emailField .getText().toString().trim());
-        String password = passwordField.getText().toString().trim();
+        if (!TextUtils.isEmpty(nameField.getText().toString().trim()) && !TextUtils.isEmpty(emailField .getText().toString().trim()) && !TextUtils.isEmpty(passwordField.getText().toString().trim())) {
 
-        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
-
-            //traducir
-            mProgress.setMessage("Singing Up");
+            mProgress.setMessage(getResources().getString(R.string.signing_up));
             mProgress.show();
 
-            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            mAuth.createUserWithEmailAndPassword(emailField .getText().toString().trim(), passwordField.getText().toString().trim()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
 
                     if (task.isSuccessful()) {
                         String user_id = mAuth.getCurrentUser().getUid();
                         DatabaseReference current_user_db = mDatabase.child(user_id);
-                        current_user_db.child("name").setValue(name);
+                        current_user_db.child("name").setValue(nameField.getText().toString().trim());
                         current_user_db.child("image").setValue("default");
-                        mProgress.dismiss();
+                        //mProgress.dismiss();
                     } else {
                         Log.w(TAG, "signInWithEmail:failed", task.getException());
                         try {
                             throw task.getException();
                         } catch(FirebaseAuthWeakPasswordException e) {
-                            passwordField.setError("Password");
+                            passwordField.setError(getResources().getString(R.string.invalid_password));
                             passwordField.requestFocus();
                         } catch(FirebaseAuthInvalidCredentialsException e) {
-                            emailField.setError("Email inválido");
+                            emailField.setError(getResources().getString(R.string.invalid_email));
                             emailField.requestFocus();
                         } catch(FirebaseAuthUserCollisionException e) {
-                            emailField.setError("User exist");
+                            emailField.setError(getResources().getString(R.string.email_taken));
                             emailField.requestFocus();
                         } catch(Exception e) {
+                            Toast.makeText(RegisterActivity.this, "Error", Toast.LENGTH_SHORT).show();
                             Log.e(TAG, e.getMessage());
                         }
                     }
+                    mProgress.dismiss();
 
                 }
 
             });
 
+        } else {
+            Toast.makeText(RegisterActivity.this, getResources().getString(R.string.fields_empty), Toast.LENGTH_SHORT).show();
         }
 
     }

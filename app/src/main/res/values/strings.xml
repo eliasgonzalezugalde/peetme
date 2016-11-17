@@ -6,6 +6,16 @@
     <string name="firebase_error_login" id="firebase_error_login">Error login</string>
     <string name="login_normal_account" id="login_normal_account">No, start with a normal account</string>
 
+    <!-- FIELDS -->
+    <string name="email_taken" id="email_taken">This email is taken</string>
+    <string name="invalid_email" id="invalid_email">Invalid Email</string>
+    <string name="invalid_password" id="invalid_password">Invalid password. Provide at least 8 characters</string>
+    <string name="signing_up" id="signing_up">Signing Up</string>
+    <string name="logging_in" id="logging_in">Logging In</string>
+    <string name="fields_empty" id="fields_empty">Empty text fields</string>
+    <string name="authentication_failed" id="authentication_failed">Authentication failed</string>
+
+
     <string name="text_login" id="text_login">If you already have an account, just Log In, if not press the register button</string>
     <string name="log_in" id="log_in">Log In</string>
     <string name="register" id="register">Register</string>

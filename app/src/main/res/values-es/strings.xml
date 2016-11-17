@@ -6,6 +6,16 @@
     <string id="firebase_error_login" name="firebase_error_login">Error entrando</string>
     <string id="login_normal_account" name="login_normal_account">No, iniciar con una cuenta normal</string>
 
+    <!-- CAMPOS DE TEXTO -->
+    <string name="email_taken" id="email_taken">El email está tomado</string>
+    <string name="invalid_email" id="invalid_email">Email inválido</string>
+    <string name="invalid_password" id="invalid_password">Contrasea inválida. Proporciona al menos 8 carácteres</string>
+    <string name="signing_up" id="signing_up">Registrándote</string>
+    <string name="logging_in" id="logging_in">Ingresando</string>
+    <string name="fields_empty" id="fields_empty">Campos de texto vacíos</string>
+    <string name="authentication_failed" id="authentication_failed">Error de autenticación</string>
+
+
     <string name="text_login" id="text_login">Si ya tienes una cuenta, solamente ingresa, si no es así, presiona el botón de registro</string>
     <string name="log_in" id="log_in">Iniciar sesión</string>
     <string name="register" id="register">Registrarse</string>

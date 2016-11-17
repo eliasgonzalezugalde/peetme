@@ -1,5 +1,6 @@
 package peetme.app.trunimal.com.peetme;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -31,10 +32,15 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.google.firebase.database.DatabaseReference;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -45,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
     private GoogleApiClient mGoogleApiClient;
     final private static String TAG = "LOGIN_ACTIVITY";
     private FirebaseAuth.AuthStateListener mAuthListener;
-
+    private ProgressDialog mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordField = (EditText) findViewById(R.id.passwordField);
         loginBtn = (Button) findViewById(R.id.loginBtn);
         registerBtn = (Button) findViewById(R.id.registerBtn);
+        mProgress = new ProgressDialog(this);
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -99,20 +106,34 @@ public class LoginActivity extends AppCompatActivity {
 
     private void startSignIn() {
 
-        String email = emailField.getText().toString();
-        String password = passwordField.getText().toString();
+        if (!TextUtils.isEmpty(emailField.getText().toString().trim()) || !TextUtils.isEmpty(passwordField.getText().toString().trim())) {
 
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(LoginActivity.this, "Fields are empty", Toast.LENGTH_SHORT).show();
-        } else {
-            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            mProgress.setMessage(getResources().getString(R.string.logging_in));
+            mProgress.show();
+
+            mAuth.signInWithEmailAndPassword(emailField.getText().toString().trim(), passwordField.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (!task.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this, "Sing in problem", Toast.LENGTH_SHORT).show();
+                        Log.w(TAG, "signInWithEmail:failed", task.getException());
+                        try {
+                            throw task.getException();
+                        } catch(FirebaseAuthInvalidUserException e) {
+                            emailField.setError(getResources().getString(R.string.invalid_email));
+                            emailField.requestFocus();
+                        } catch(FirebaseAuthInvalidCredentialsException e) {
+                            passwordField.setError(getResources().getString(R.string.invalid_password));
+                            passwordField.requestFocus();
+                        } catch(Exception e) {
+                            Toast.makeText(LoginActivity.this, getResources().getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, e.getMessage());
+                        }
                     }
+                    mProgress.dismiss();
                 }
             });
+        } else {
+            Toast.makeText(LoginActivity.this, getResources().getString(R.string.fields_empty), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -123,4 +144,3 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 }
-
