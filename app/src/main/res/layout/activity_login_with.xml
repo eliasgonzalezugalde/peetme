@@ -1,64 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_login_with"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/f1f1f1"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
-    tools:context="peetme.app.trunimal.com.peetme.LoginWithActivity"
-    android:background="@color/f1f1f1"
-    android:weightSum="1">
+    tools:context="peetme.app.trunimal.com.peetme.LoginWithActivity">
 
-    <ImageView
-        android:layout_height="125dp"
-        app:srcCompat="@drawable/logo"
-        android:id="@+id/imgLogo"
-        android:layout_width="105dp"
-        android:layout_gravity="center" />
-
-    <com.google.android.gms.common.SignInButton
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/googleBtn"
-        android:layout_marginTop="15dp"
-        android:textAlignment="center"
-        />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="1">
 
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/button_facebook_login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="connect_with_facebook"
-        android:layout_marginTop="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="12dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"/>
+        <ImageView
+            android:id="@+id/imgLogo"
+            android:layout_width="105dp"
+            android:layout_height="125dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/logo" />
 
-    <TextView
-        android:text="@string/login_normal_account"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/normalAcount"
-        android:textColor="@color/hintColor"
-        android:textAlignment="center"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"/>
-    
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/googleBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:textAlignment="center" />
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/button_facebook_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="20dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="12dp"
+            android:paddingTop="10dp"
+            android:text="connect_with_facebook" />
+
+        <TextView
+            android:id="@+id/normalAcount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:text="@string/login_normal_account"
+            android:textAlignment="center"
+            android:textColor="@color/hintColor" />
+
+    </LinearLayout>
+
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        android:visibility="gone"/>
-    
-    
+        android:visibility="gone" />
 
-</LinearLayout>
+</RelativeLayout>

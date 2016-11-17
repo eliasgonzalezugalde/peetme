@@ -21,6 +21,7 @@
         app:srcCompat="@drawable/logo" />
 
     <EditText
+        android:id="@+id/nameField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
@@ -28,39 +29,39 @@
         android:ems="10"
         android:padding="15dp"
         android:layout_marginTop="15dp"
-        android:background="@drawable/input_outline"
-        android:id="@+id/nameField" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:hint="@string/email"
-        android:fontFamily="sans-serif"
-        android:layout_marginTop="20dp"
-        android:id="@+id/emailField"
-        android:padding="15dp"
         android:background="@drawable/input_outline" />
 
     <EditText
+        android:id="@+id/emailField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
         android:ems="10"
-        android:hint="@string/password"
+        android:hint="@string/email"
+        android:fontFamily="sans-serif"
+        android:layout_marginTop="20dp"
+        android:padding="15dp"
+        android:background="@drawable/input_outline" />
+
+    <EditText
         android:id="@+id/passwordField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:fontFamily="sans-serif"
+        android:hint="@string/password"
         android:layout_marginTop="20dp"
         android:padding="15dp"
         android:background="@drawable/input_outline" />
 
     <Button
+        android:id="@+id/registerBtn"
         android:background="@drawable/btn_background"
         android:textColor="@color/whiteColor"
         android:text="@string/create_account"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/button2"
         android:layout_below="@+id/editText2"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp" />

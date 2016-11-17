@@ -85,9 +85,6 @@
         -->
 
         <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_animal_maps" />
-        <activity
             android:name=".PetIndexActivity"
             android:label="@string/title_activity_pet_index" />
         <activity
