@@ -18,13 +18,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/locationBtn"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="60dp"
+            android:layout_marginRight="5dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/my_location"
+            app:srcCompat="@drawable/my_location" />
 
     </RelativeLayout>
 
     <include
         layout="@layout/app_bar_main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:id="@+id/asd"/>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"

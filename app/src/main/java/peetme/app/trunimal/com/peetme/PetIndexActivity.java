@@ -7,6 +7,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -48,14 +50,32 @@ public class PetIndexActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(PetViewHolder viewHolder, Pet model, int position) {
 
+                final String pet_id = getRef(position).getKey().toString();
+
                 viewHolder.setTitle(model.getName());
                 viewHolder.setDesc(model.getDescription());
                 viewHolder.setImage(getApplicationContext(), model.getImage());
 
+                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        goSingleActivity(pet_id);
+
+                    }
+                });
+
             }
         };
-
         petList.setAdapter(firebaseRecyclerAdapter);
+
+    }
+
+    public void goSingleActivity(String pet_id) {
+
+        Intent intent = new Intent(PetIndexActivity.this, PetSingleActivity.class);
+        intent.putExtra("pet_id", pet_id);
+        startActivity(intent);
 
     }
 
@@ -63,8 +83,8 @@ public class PetIndexActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
 
         getMenuInflater().inflate(R.menu.main_menu, menu);
-
         return super.onCreateOptionsMenu(menu);
+
     }
 
     @Override

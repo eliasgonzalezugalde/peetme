@@ -15,6 +15,8 @@
     <string name="fields_empty" id="fields_empty">Empty text fields</string>
     <string name="authentication_failed" id="authentication_failed">Authentication failed</string>
 
+    <string name="setup_account" id="setup_account">Authentication failed</string>
+    <string name="save" id="save">Save</string>
 
     <string name="text_login" id="text_login">If you already have an account, just Log In, if not press the register button</string>
     <string name="log_in" id="log_in">Log In</string>
@@ -22,6 +24,8 @@
     <string name="create_account" id="create_account">Create new account</string>
     <string name="password" id="password">Password</string>
     <string name="email" id="email">Email</string>
+    <string name="enter_display_name" id="enter_display_name">Enter your display name</string>
+    <string name="display_name" id="display_name">Display name</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -68,6 +72,11 @@
     <string name="additionalInfo">Additional info</string>
     <string name="additionalInfo_hint">e.g I found it about 5 days ago</string>
     <string name="select" id="select">Select an option</string>
+    <string name="image_not_found" id="image_not_found">Image not found</string>
+
+    <string name="created_date" id="created_date">Created date</string>
+    <string name="my_name_is" id="my_name_is">My name is</string>
+    <string name="adopted" id="adopted">Adopted</string>
 
     <string name="dog" id="dog">Dog</string>
     <string name="cat" id="cat">Cat</string>

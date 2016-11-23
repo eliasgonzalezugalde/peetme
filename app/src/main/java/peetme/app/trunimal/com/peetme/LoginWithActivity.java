@@ -30,6 +30,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginWithActivity extends AppCompatActivity {
 
@@ -43,6 +48,7 @@ public class LoginWithActivity extends AppCompatActivity {
     private LoginButton loginButton;
     private CallbackManager mCallbackManager;
     private ProgressBar progressBar;
+    private DatabaseReference mDatabaseUsers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +62,7 @@ public class LoginWithActivity extends AppCompatActivity {
         loginButton = (LoginButton) findViewById(R.id.button_facebook_login);
         loginButton.setReadPermissions("email", "public_profile");
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("users");
 
         loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -142,6 +149,8 @@ public class LoginWithActivity extends AppCompatActivity {
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(LoginWithActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
+                        } else {
+                            //checkUserExist();
                         }
                         progressBar.setVisibility(View.GONE);
                         loginButton.setVisibility(View.VISIBLE);
@@ -149,6 +158,29 @@ public class LoginWithActivity extends AppCompatActivity {
                         // ...
                     }
                 });
+    }
+
+    private void checkUserExist() {
+
+        if (mAuth.getCurrentUser() != null) {
+            mDatabaseUsers.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.hasChild(mAuth.getCurrentUser().getUid())) {
+                        Toast.makeText(LoginWithActivity.this, "You need to setup your account", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(LoginWithActivity.this, SetupActivity.class);
+                        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
     }
 
     private void goMainActivity() {

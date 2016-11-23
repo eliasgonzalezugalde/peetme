@@ -36,6 +36,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -56,7 +58,7 @@ public class PetCreateActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int GALLERY_REQUEST = 1;
-    private static final int REQUEST_IMAGE_CAPTURE = 2;
+    //private static final int REQUEST_IMAGE_CAPTURE = 2;
 
     private Date date;
     private CharSequence charSequence;
@@ -85,6 +87,9 @@ public class PetCreateActivity extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
 
+    //private FirebaseAuth mAuth;
+    //private FirebaseUser mCurrentUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -94,8 +99,8 @@ public class PetCreateActivity extends AppCompatActivity implements
 
         mStorage = FirebaseStorage.getInstance().getReference();
         mDatabasePet = FirebaseDatabase.getInstance().getReference().child("pet");
-        mDatabasePetLocations = FirebaseDatabase.getInstance().getReference().child("pet_locations");
         mDatabasePet.keepSynced(true);
+        mDatabasePetLocations = FirebaseDatabase.getInstance().getReference().child("pet_locations");
         mDatabasePetLocations.keepSynced(true);
 
         textViewLocationResult = (TextView) findViewById(R.id.textViewLocationResult);
@@ -143,6 +148,9 @@ public class PetCreateActivity extends AppCompatActivity implements
 
         //Google Play Services & Get the Last Known Location
         buildGoogleApiClient();
+
+        //mAuth= FirebaseAuth.getInstance();
+        //mCurrentUser = mAuth.getCurrentUser();
 
         Log.i("GEO",String.valueOf(mDatabasePetLocations));
 
@@ -307,6 +315,7 @@ public class PetCreateActivity extends AppCompatActivity implements
     }
 
     private void startPosting() {
+
         mProgress.setMessage(getResources().getString(R.string.saving) + " ...");
         mProgress.show();
         mProgress.setCancelable(false);
@@ -355,9 +364,9 @@ public class PetCreateActivity extends AppCompatActivity implements
                 && spinnerSize.getSelectedItemPosition() != 0
                 && !TextUtils.isEmpty(health_val)
                 && spinnerHealth.getSelectedItemPosition() != 0) {
-
+            
             //StorageReference filepath = mStorage.child("Pet_Images").child(imageUri.getLastPathSegment());
-            StorageReference filepath = mStorage.child("Pet_Images").child(random());
+            StorageReference filepath = mStorage.child("Pet_Images").child(randomString());
 
             filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -385,9 +394,7 @@ public class PetCreateActivity extends AppCompatActivity implements
                     newPet.child("createdDate").setValue(String.valueOf(charSequence));
                     newPet.child("adopted").setValue(false);
                     newPet.child("active").setValue(true);
-
-                    //newPet.child("uid").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                    newPet.child("uid").setValue(1);
+                    newPet.child("uid").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
                     geoFirePet.setLocation(newPet.getKey(), new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new GeoFire.CompletionListener() {
                         @Override
@@ -415,17 +422,15 @@ public class PetCreateActivity extends AppCompatActivity implements
 
     }
 
-    public static String random() {
+    public static String randomString() {
 
         Random generator = new Random();
         StringBuilder randomStringBuilder = new StringBuilder();
         int randomLength = generator.nextInt(22);
         char tempChar;
         for (int i = 0; i < randomLength; i++) {
-
             tempChar = (char) (generator.nextInt(96) + 32);
             randomStringBuilder.append(tempChar);
-
         }
         return randomStringBuilder.toString();
 
@@ -442,18 +447,10 @@ public class PetCreateActivity extends AppCompatActivity implements
 
         }
 
-        //con el dialog
-        //requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK
-        //
+        //requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK //DIALOG
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == this.RESULT_OK) {
 
-            //obtener bitmap desde la cámara
-            //Bundle extras = data.getExtras();
-            //Bitmap imageBitmap = (Bitmap) extras.get("data");
             //Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
-
-            //imageUri = getPickImageResultUri(data);
-            //getCaptureImageOutputUri() //https://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/
             //imageUri = CropImage.getCaptureImageOutputUri(getApplicationContext());
 
             imageUri = CropImage.getPickImageResultUri(this, data);
@@ -496,21 +493,6 @@ public class PetCreateActivity extends AppCompatActivity implements
         if (mLastLocation != null) {
             Log.i("Latitude", String.valueOf(mLastLocation.getLatitude()));
             Log.i("Longitude", String.valueOf(mLastLocation.getLongitude()));
-
-            /*
-            final Geocoder geocoder = new Geocoder(getApplicationContext());
-            final List<Address> addresses;
-            try {
-                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(),
-                        mLastLocation.getLongitude(), 1);
-            } catch (IOException e) {
-
-
-            }
-            if (addresses != null && !addresses.isEmpty()) {
-                locationBtn.setText(String.valueOf(addresses.get(0)));
-            }
-            */
 
         } else {
             Log.i("LOCATION PROBLEM", " --> NULL");

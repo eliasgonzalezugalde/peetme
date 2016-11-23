@@ -15,6 +15,8 @@
     <string name="fields_empty" id="fields_empty">Campos de texto vacíos</string>
     <string name="authentication_failed" id="authentication_failed">Error de autenticación</string>
 
+    <string name="setup_account" id="setup_account">Error de autenticación</string>
+    <string name="save" id="save">Guardar</string>
 
     <string name="text_login" id="text_login">Si ya tienes una cuenta, solamente ingresa, si no es así, presiona el botón de registro</string>
     <string name="log_in" id="log_in">Iniciar sesión</string>
@@ -22,6 +24,8 @@
     <string name="create_account" id="create_account">Crear nueva cuenta</string>
     <string name="password" id="password">Contraseña</string>
     <string name="email" id="email">Email</string>
+    <string name="enter_display_name" id="enter_display_name">Ingrese un nombre para mostrar</string>
+    <string name="display_name" id="display_name">Nombre para mostrar</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -68,6 +72,11 @@
     <string name="additionalInfo">Información adicional</string>
     <string name="additionalInfo_hint">Ej: Lo encontré hace 5 días</string>
     <string name="select" id="select">Escoge una opción</string>
+    <string name="image_not_found" id="image_not_found">Imagen no encontrada</string>
+
+    <string name="created_date" id="created_date">Fecha de creación</string>
+    <string name="my_name_is" id="my_name_is">Mi nombre es</string>
+    <string name="adopted" id="adopted">Adoptado</string>
 
     <string id="dog" name="dog">Perro</string>
     <string id="cat" name="cat">Gato</string>

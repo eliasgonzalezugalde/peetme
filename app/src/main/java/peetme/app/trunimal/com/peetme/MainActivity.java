@@ -23,6 +23,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.Manifest;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +49,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -59,9 +62,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,7 +78,6 @@ public class MainActivity extends AppCompatActivity
         GoogleApiClient.OnConnectionFailedListener,
         //OnPermissionCallback,
         GeoQueryEventListener,
-        GoogleMap.OnCameraChangeListener,
         LocationListener {
 
     private static final String LOCATION_KEY = "LK";
@@ -82,6 +86,7 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private DatabaseReference mDatabasePetLocations;
+    private DatabaseReference mDatabaseUsers;
     private GeoFire geoFire;
     private GeoQuery geoQuery;
     //private final String PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -93,12 +98,14 @@ public class MainActivity extends AppCompatActivity
     private Circle searchCircle;
     private LocationRequest locationRequest;
     private static final int REQUEST_LOCATION = 5;
-    private static final String TAG = "LOCATION ACTIVITY";
+    private static final String TAG = "LOCATION_ACTIVITY";
     private static final int REQUEST_CHECK_SETTINGS = 6;
     public static final long UPDATE_INTERVAL = 1000;
     public static final long UPDATE_FASTEST_INTERVAL = UPDATE_INTERVAL / 2;
     private Marker currentMarker;
     private MarkerOptions currentMarkerOptions;
+    private ImageButton locationBtn;
+    private double searchRadius;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,13 +123,18 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        locationBtn = (ImageButton) findViewById(R.id.locationBtn);
+
         mDatabasePetLocations = FirebaseDatabase.getInstance().getReference().child("pet_locations");
-        //mDatabasePetLocations.keepSynced(true);
+        mDatabasePetLocations.keepSynced(true);
+        mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("users");
+        mDatabaseUsers.keepSynced(true);
         geoFire = new GeoFire(mDatabasePetLocations);
 
         View hView = navigationView.getHeaderView(0);
         emailTextView = (TextView) hView.findViewById(R.id.emailTextView);
         nameTextView = (TextView) hView.findViewById(R.id.nameTextView);
+        searchRadius = 4; //kilometers
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -146,7 +158,8 @@ public class MainActivity extends AppCompatActivity
 
         //Google Play Services & Get the Last Known Location
         buildGoogleApiClient();
-
+        //getting location savedInstanceState
+        updateValuesFromBundle(savedInstanceState);
         // setup markers
         this.markers = new HashMap<String, Marker>();
 
@@ -155,6 +168,13 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
                     mMap = googleMap;
+                    mMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+                        @Override
+                        public void onCameraMoveStarted(int i) {
+                            locationBtn.setImageResource(R.drawable.my_location);
+                        }
+                    });
+
                 }
             });
 
@@ -206,7 +226,40 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        updateValuesFromBundle(savedInstanceState);
+
+        checkUserExist();
+
+        locationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
+                        mLastLocation.getLatitude(), mLastLocation.getLongitude()), mMap.getCameraPosition().zoom)); //18.0f
+                locationBtn.setImageResource(R.drawable.my_location_blue);
+
+            }
+        });
+
+    }
+
+    private void checkUserExist() {
+
+        if (mAuth.getCurrentUser() != null) {
+            mDatabaseUsers.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.hasChild(mAuth.getCurrentUser().getUid())) {
+                        Toast.makeText(MainActivity.this, "You need to setup your account", Toast.LENGTH_SHORT).show();
+                        //startActivity(new Intent(MainActivity.this, SetupActivity.class));
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
 
     }
 
@@ -229,9 +282,17 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStart() {
+
         mGoogleApiClient.connect();
         mAuth.addAuthStateListener(mAuthListener);
         super.onStart();
+
+        if (mLastLocation != null) {
+            mMap.addMarker(currentMarkerOptions = new MarkerOptions()
+                    .position(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
+                    .title("Current location")
+                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.pin_current_blue)));
+        }
 
     }
 
@@ -244,6 +305,7 @@ public class MainActivity extends AppCompatActivity
             marker.remove();
         }
         this.markers.clear();
+        mMap.clear();
     }
 
     @Override
@@ -272,7 +334,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            startActivity(new Intent(MainActivity.this, SetupActivity.class));// return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -300,6 +362,8 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(MainActivity.this, StrayIndexActivity.class));
 
         }*/ else if (id == R.id.nav_settings) {
+
+            startActivity(new Intent(MainActivity.this, SetupActivity.class));
 
         } else if (id == R.id.nav_sing_out) {
 
@@ -341,17 +405,36 @@ public class MainActivity extends AppCompatActivity
                 .position(currentLocation)
                 .title("Current location")
                 //.snippet("Parque de Cuidad Quesada")
-                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_animal))
-                .anchor(0.0f, 1.0f);
+                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.pin_current_blue));
+        //.anchor(0.0f, 1.0f);
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
 
-        searchCircle = this.mMap.addCircle(new CircleOptions().center(currentLocation).radius(4000));
-        searchCircle.setFillColor(Color.argb(40, 229, 50, 29));
-        searchCircle.setStrokeColor(Color.argb(75, 229, 50, 29));
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        //mMap.setMyLocationEnabled(true);
+
+        //circulo
+        searchCircle = this.mMap.addCircle(new CircleOptions().center(currentLocation).radius(searchRadius * 1000));
+        searchCircle.setFillColor(Color.argb(40, 66, 133, 244));
+        searchCircle.setStrokeColor(Color.argb(75, 57, 115, 211));
+        //rojo
+        //searchCircle.setFillColor(Color.argb(40, 229, 50, 29));
+        //searchCircle.setStrokeColor(Color.argb(75, 229, 50, 29));
+
 
         // Iniciamos las actualizaciones de ubicación
         startLocationUpdates();
 
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(TAG, String.format("Nueva ubicación: (%s, %s)",
+                location.getLatitude(), location.getLongitude()));
+        mLastLocation = location;
+        updateLocationUI();
     }
 
     private void startLocationUpdates() {
@@ -394,7 +477,7 @@ public class MainActivity extends AppCompatActivity
         if (mLastLocation != null) {
             updateLocationUI();
         } else {
-            Log.i(TAG,"Localización nula");
+            Log.i(TAG, "Localización nula");
         }
     }
 
@@ -433,7 +516,7 @@ public class MainActivity extends AppCompatActivity
         Log.i("Latitude", String.valueOf(mLastLocation.getLatitude()));
         Log.i("Longitude", String.valueOf(mLastLocation.getLongitude()));
 
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 4);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), searchRadius);
         this.geoQuery.addGeoQueryEventListener(this);
 
         if (mapFragment != null) {
@@ -444,7 +527,7 @@ public class MainActivity extends AppCompatActivity
                     mMap = googleMap;
                     //mMap.clear();
                     LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                    if(currentMarker == null) {
+                    if (currentMarker == null) {
                         currentMarker = mMap.addMarker(currentMarkerOptions);
                     } else {
                         currentMarker.setPosition(currentLocation);
@@ -501,31 +584,54 @@ public class MainActivity extends AppCompatActivity
     public void onKeyEntered(String key, GeoLocation location) {
         // Add a new marker to the map
         Marker marker = this.mMap.addMarker(new MarkerOptions().position(new LatLng(location.latitude, location.longitude)));
-        marker.setIcon((BitmapDescriptorFactory.fromResource(R.drawable.pin_animal)));
+        marker.setTag(key); //animal_id
+        marker.setIcon((BitmapDescriptorFactory.fromResource(R.mipmap.pin_animal)));
         this.markers.put(key, marker);
+
     }
 
     @Override
     public void onKeyExited(String key) {
         // Remove any old marker
+        /*
         Marker marker = this.markers.get(key);
         if (marker != null) {
             marker.remove();
             this.markers.remove(key);
         }
+        */
     }
 
     @Override
     public void onKeyMoved(String key, GeoLocation location) {
         // Move the marker
+        /*
         Marker marker = this.markers.get(key);
         if (marker != null) {
+            //marker.setTag(key);
             this.animateMarkerTo(marker, location.latitude, location.longitude);
         }
+        */
     }
 
     @Override
     public void onGeoQueryReady() {
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if (marker.getTag() != null) {
+                    goSingleActivity(String.valueOf(marker.getTag()));
+                }
+                return false;
+            }
+        });
+    }
+
+    public void goSingleActivity(String pet_id) {
+
+        Intent intent = new Intent(MainActivity.this, PetSingleActivity.class);
+        intent.putExtra("pet_id", pet_id);
+        startActivity(intent);
 
     }
 
@@ -540,6 +646,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void animateMarkerTo(final Marker marker, final double lat, final double lng) {
+
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
         final long DURATION_MS = 3000;
@@ -562,27 +669,10 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+
     }
+
     //////////////////////////////////////////////////////////GeoQueryEventListener/////////////////////////////////////////////////////////////
-
-    private double zoomLevelToRadius(double zoomLevel) {
-        // Approximation to fit circle into view
-        return 16384000 / Math.pow(2, zoomLevel);
-    }
-
-    @Override
-    public void onCameraChange(CameraPosition cameraPosition) {
-        // Update the search criteria for this geoQuery and the circle on the map
-
-        LatLng center = cameraPosition.target;
-        double radius = zoomLevelToRadius(cameraPosition.zoom);
-        searchCircle.setCenter(center);
-        searchCircle.setRadius(radius);
-
-        this.geoQuery.setCenter(new GeoLocation(center.latitude, center.longitude));
-        // radius in km
-        this.geoQuery.setRadius(radius / 1000);
-    }
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -647,14 +737,5 @@ public class MainActivity extends AppCompatActivity
                     .build();
         }
     }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        Log.d(TAG, String.format("Nueva ubicación: (%s, %s)",
-                location.getLatitude(), location.getLongitude()));
-        mLastLocation = location;
-        updateLocationUI();
-    }
-
 
 }
