@@ -11,16 +11,29 @@
             android:id="@+id/nav_vets"
             android:icon="@mipmap/ic_vets_black_24dp"
             android:title="@string/vets" />
-        <item
-            android:id="@+id/nav_animal_shelters"
-            android:icon="@mipmap/ic_shelters_black_24dp"
-            android:title="@string/animal_shelters" />
+        <!--<item-->
+            <!--android:id="@+id/nav_animal_shelters"-->
+            <!--android:icon="@mipmap/ic_shelters_black_24dp"-->
+            <!--android:title="@string/animal_shelters" />-->
         <!--<item-->
             <!--android:id="@+id/nav_stray_animal"-->
             <!--android:icon="@mipmap/ic_report_black_24dp"-->
             <!--android:title="@string/stray_animal" />-->
 
-        <item android:title="App">
+        <item android:title="">
+            <menu>
+                <item
+                    android:id="@+id/nav_my_pets"
+                    android:icon="@mipmap/ic_animals_black_24dp"
+                    android:title="@string/my_pets" />
+                <item
+                    android:id="@+id/nav_my_vets"
+                    android:icon="@mipmap/ic_vets_black_24dp"
+                    android:title="@string/my_vets" />
+            </menu>
+        </item>
+
+        <item android:title="">
             <menu>
                 <item
                     android:id="@+id/nav_settings"

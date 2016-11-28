@@ -6,26 +6,58 @@
     android:gravity="center|center_vertical"
     android:id="@+id/dialog_image">
 
-    <TextView
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:text="@string/camera"
-        android:layout_margin="10dp"
-        android:drawablePadding="15dp"
-        android:drawableLeft="@drawable/ic_menu_camera"
-        android:padding="10dp"
-        android:id="@+id/textView_camera"/>
+    <!--<TextView-->
+        <!--android:layout_width="250dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textSize="18sp"-->
+        <!--android:text="5km"-->
+        <!--android:layout_margin="10dp"-->
+        <!--android:drawablePadding="15dp"-->
+        <!--android:drawableLeft="@drawable/ic_menu_camera"-->
+        <!--android:padding="10dp"-->
+        <!--android:id="@+id/textView_camera"/>-->
+
+    <!--<TextView-->
+        <!--android:layout_width="250dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="10km"-->
+        <!--android:textSize="18sp"-->
+        <!--android:padding="10dp"-->
+        <!--android:layout_margin="10dp"-->
+        <!--android:drawableLeft="@drawable/ic_menu_gallery"-->
+        <!--android:drawablePadding="15dp"-->
+        <!--android:id="@+id/textView_gallery"/>-->
 
     <TextView
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:text="@string/gallery"
-        android:textSize="18sp"
+        android:text="-"
+        android:textSize="33dp"
         android:padding="10dp"
         android:layout_margin="10dp"
-        android:drawableLeft="@drawable/ic_menu_gallery"
         android:drawablePadding="15dp"
-        android:id="@+id/textView_gallery"/>
+        android:textAlignment="center"
+        android:id="@+id/range"/>
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBar"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:progressTint="@color/blueColor"
+        android:thumbTint="@color/blueColor"/>
+
+    <Button
+        android:text="Set range"
+        android:background="@drawable/btn_background_blue"
+        android:textColor="#f1f1f1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonRange"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="15dp"/>
 
 </LinearLayout>

@@ -36,6 +36,37 @@
     <string name="vets">Veterinarias</string>
     <string name="animal_shelters">Refugios</string>
     <string name="stray_animal">Animales extraviados</string>
+    <string name="my_pets">Mis animales</string>
+    <string name="my_vets">Mis veterinarias</string>
+
+    <string id="location_1" name="location_1">Los ajustes de ubicación satisfacen la configuración.</string>
+    <string id="location_2" name="location_2">Los ajustes de ubicación no satisfacen la configuración. Se mostrará un diálogo de ayuda.</string>
+    <string id="location_3" name="location_3">El Intent del diálogo no funcionó.</string>
+    <string id="location_4" name="location_4">Los ajustes de ubicación no son apropiados.</string>
+    <string id="set_range" name="set_range">Seleccionar el rango de búsqueda</string>
+    <string id="range" name="range">Rango</string>
+    <string id="current_location" name="current_location">Ubicacion actual.</string>
+    <string id="config_account" name="config_account">Necesitas configurar tu cuenta.</string>
+    <string id="allowed_user" name="allowed_user">El usuario permitió el cambio de ajustes de ubicación.</string>
+    <string id="user_did_not_allow" name="user_did_not_allow">El usuario no permitió el cambio de ajustes de ubicación.</string>
+    <string id="new_location" name="new_location">Nueva localización.</string>
+    <string id="null_location" name="null_location">Localización nula.</string>
+    <string id="location_not_found" name="location_not_found">Ubicacion no encontrada.</string>
+    <string id="permissions" name="permissions">Permisos no otorgados.</string>
+    <string id="latitude" name="latitude">Latitud</string>
+    <string id="longitude" name="longitude">longitud</string>
+    <string id="error_geofire" name="error_geofire">Se ha producido un error inesperado al consultar GeoFire: </string>
+    <string id="connection_suspended" name="connection_suspended">Conexión suspendida... </string>
+    <string id="failed_to_connect" name="failed_to_connect">Falló la conección... </string>
+
+    <string id="edit" name="edit">Editar</string>
+    <string id="delete" name="delete">Borrar</string>
+    <string id="ok" name="ok">Aceptar</string>
+    <string id="cancel" name="cancel">Cancelar</string>
+
+    <string id="are_you_sure_delete" name="are_you_sure_delete">¿Estás seguro de que quieres eliminar este animal?</string>
+    <string id="confirm_delete" name="confirm_delete">Borrar</string>
+    <string id="animal_deleted" name="animal_deleted">Animal borrado</string>
 
     <string id="add_image_from" name="add_image_from">Agregar imagen desde</string>
     <string id="camera" name="camera">Camara</string>
@@ -54,7 +85,9 @@
     <string name="title_activity_stray_create">Agregando un animal extraviado</string>
 
     <string id="saving" name="saving">Guardando</string>
-    <string id="saved" name="saved">Animal guardado exitosamente</string>
+    <string id="pet_saved" name="pet_saved">Animal guardado exitosamente</string>
+    <string name="vet_saved" id="vet_saved">Veterinaria guardada exitosamente</string>
+    <string name="saved" id="saved">Guardado exitosamente</string>
 
     <string id="species" name="species">Especie</string>
     <string name="name_hint" id="name_hint">Si no tiene nombre, dale uno</string>
@@ -73,6 +106,11 @@
     <string name="additionalInfo_hint">Ej: Lo encontré hace 5 días</string>
     <string name="select" id="select">Escoge una opción</string>
     <string name="image_not_found" id="image_not_found">Imagen no encontrada</string>
+
+    <string name="phone" id="phone">Teléfono</string>
+    <string name="open247" id="open247">Abierto 24/7</string>
+    <string name="yes" id="yes">Si</string>
+    <string name="no" id="no">No</string>
 
     <string name="created_date" id="created_date">Fecha de creación</string>
     <string name="my_name_is" id="my_name_is">Mi nombre es</string>

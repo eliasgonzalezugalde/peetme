@@ -100,7 +100,7 @@ public class PetCreateActivity extends AppCompatActivity implements
         mStorage = FirebaseStorage.getInstance().getReference();
         mDatabasePet = FirebaseDatabase.getInstance().getReference().child("pet");
         mDatabasePet.keepSynced(true);
-        mDatabasePetLocations = FirebaseDatabase.getInstance().getReference().child("pet_locations");
+        mDatabasePetLocations = FirebaseDatabase.getInstance().getReference().child("locations");
         mDatabasePetLocations.keepSynced(true);
 
         textViewLocationResult = (TextView) findViewById(R.id.textViewLocationResult);
@@ -366,7 +366,7 @@ public class PetCreateActivity extends AppCompatActivity implements
                 && spinnerHealth.getSelectedItemPosition() != 0) {
             
             //StorageReference filepath = mStorage.child("Pet_Images").child(imageUri.getLastPathSegment());
-            StorageReference filepath = mStorage.child("Pet_Images").child(randomString());
+            StorageReference filepath = mStorage.child("Pet_Images").child("pet" + randomString());
 
             filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -376,7 +376,6 @@ public class PetCreateActivity extends AppCompatActivity implements
 
                     GeoFire geoFirePet = new GeoFire(mDatabasePetLocations);
                     DatabaseReference newPet = mDatabasePet.push();
-
                     newPet.child("image").setValue(donwloadUrl.toString());
                     newPet.child("species").setValue(species_val);
                     newPet.child("name").setValue(nameField.getText().toString().trim());
@@ -396,7 +395,7 @@ public class PetCreateActivity extends AppCompatActivity implements
                     newPet.child("active").setValue(true);
                     newPet.child("uid").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                    geoFirePet.setLocation(newPet.getKey(), new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new GeoFire.CompletionListener() {
+                    geoFirePet.setLocation("pet" + newPet.getKey(), new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new GeoFire.CompletionListener() {
                         @Override
                         public void onComplete(String key, DatabaseError error) {
                             if (error != null) {
@@ -409,8 +408,8 @@ public class PetCreateActivity extends AppCompatActivity implements
 
                     mProgress.dismiss();
                     finish();
-                    Toast.makeText(PetCreateActivity.this, getResources().getString(R.string.saved), Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(PetCreateActivity.this, PetIndexActivity.class));
+                    Toast.makeText(PetCreateActivity.this, getResources().getString(R.string.pet_saved), Toast.LENGTH_SHORT).show();
+                    //startActivity(new Intent(PetCreateActivity.this, PetIndexActivity.class));
 
                 }
             });

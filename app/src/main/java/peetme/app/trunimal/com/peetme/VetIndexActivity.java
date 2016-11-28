@@ -24,7 +24,7 @@ public class VetIndexActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("pet");
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("vet");
 
         vetList = (RecyclerView) findViewById(R.id.vetList);
         vetList.setHasFixedSize(true);
@@ -36,21 +36,19 @@ public class VetIndexActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        FirebaseRecyclerAdapter<Pet, PetViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Pet, PetViewHolder>(
+        FirebaseRecyclerAdapter<Vet, VetViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Vet, VetViewHolder>(
 
-                Pet.class,
+                Vet.class,
                 R.layout.animal_row,
-                PetViewHolder.class,
+                VetViewHolder.class,
                 mDatabase
 
         ) {
             @Override
-            protected void populateViewHolder(PetViewHolder viewHolder, Pet model, int position) {
-
+            protected void populateViewHolder(VetViewHolder viewHolder, Vet model, int position) {
                 viewHolder.setTitle(model.getName());
-                viewHolder.setDesc(model.getDescription());
+                viewHolder.setPhone(model.getPhone());
                 viewHolder.setImage(getApplicationContext(), model.getImage());
-
             }
         };
 

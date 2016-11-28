@@ -39,6 +39,8 @@ public class Pet {
         this.active = active;
     }
 
+
+
     public int getUserId() {
         return userId;
     }

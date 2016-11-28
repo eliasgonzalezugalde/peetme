@@ -19,12 +19,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.Manifest;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,13 +51,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity
         LocationListener {
 
     private static final String LOCATION_KEY = "LK";
+    private static final String RADIUS_KEY = "LR";
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity
     private DatabaseReference mDatabaseUsers;
     private GeoFire geoFire;
     private GeoQuery geoQuery;
+    private AlertDialog.Builder builder = null;
     //private final String PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
     //private PermissionHelper permissionHelper;
     private FirebaseAuth mAuth;
@@ -104,11 +106,12 @@ public class MainActivity extends AppCompatActivity
     public static final long UPDATE_FASTEST_INTERVAL = UPDATE_INTERVAL / 2;
     private Marker currentMarker;
     private MarkerOptions currentMarkerOptions;
-    private ImageButton locationBtn;
-    private double searchRadius;
+    private ImageButton locationBtn, radiusBtn;
+    private int searchRadius;
+    private int progress = 4;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -124,12 +127,14 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         locationBtn = (ImageButton) findViewById(R.id.locationBtn);
+        radiusBtn = (ImageButton) findViewById(R.id.radiusBtn);
 
-        mDatabasePetLocations = FirebaseDatabase.getInstance().getReference().child("pet_locations");
+        mDatabasePetLocations = FirebaseDatabase.getInstance().getReference().child("locations");
         mDatabasePetLocations.keepSynced(true);
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("users");
         mDatabaseUsers.keepSynced(true);
         geoFire = new GeoFire(mDatabasePetLocations);
+
 
         View hView = navigationView.getHeaderView(0);
         emailTextView = (TextView) hView.findViewById(R.id.emailTextView);
@@ -203,23 +208,22 @@ public class MainActivity extends AppCompatActivity
 
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
-                        Log.d(TAG, "Los ajustes de ubicación satisfacen la configuración.");
+                        Log.d(TAG, getResources().getString(R.string.location_1));
                         processLastLocation();
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         try {
-                            Log.d(TAG, "Los ajustes de ubicación no satisfacen la configuración. " +
-                                    "Se mostrará un diálogo de ayuda.");
+                            Log.d(TAG, getResources().getString(R.string.location_2));
                             status.startResolutionForResult(
                                     MainActivity.this,
                                     REQUEST_CHECK_SETTINGS);
                         } catch (IntentSender.SendIntentException e) {
-                            Log.d(TAG, "El Intent del diálogo no funcionó.");
+                            Log.d(TAG, getResources().getString(R.string.location_3));
                             // Sin operaciones
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        Log.d(TAG, "Los ajustes de ubicación no son apropiados.");
+                        Log.d(TAG, getResources().getString(R.string.location_4));
                         break;
 
                 }
@@ -234,8 +238,79 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
 
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
-                        mLastLocation.getLatitude(), mLastLocation.getLongitude()), mMap.getCameraPosition().zoom)); //18.0f
+                        mLastLocation.getLatitude(), mLastLocation.getLongitude()), mMap.getCameraPosition().zoom + (mMap.getCameraPosition().zoom / 14))); //18.0f
                 locationBtn.setImageResource(R.drawable.my_location_blue);
+
+            }
+        });
+
+        radiusBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_image, null);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder
+                        .setTitle(getResources().getString(R.string.set_range))
+                        .setView(view);
+
+                final TextView textViewRadius = (TextView) view.findViewById(R.id.range);
+                Button buttonRange = (Button) view.findViewById(R.id.buttonRange);
+                final SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBar);
+                seekBar.setMax(50);
+                seekBar.setProgress(searchRadius);
+                textViewRadius.setText("" + searchRadius + " km");
+
+                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        progress = progress;
+
+                        if (progress >= 4) {
+                            seekBar.setProgress(progress);
+                            textViewRadius.setText("" + progress + " km");
+                            searchRadius = progress;
+                        } else {
+                            seekBar.setProgress(4);
+                            textViewRadius.setText("4 km");
+                            searchRadius = 4;
+                        }
+
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+                final AlertDialog alert = builder.show();
+
+                buttonRange.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.range), Toast.LENGTH_SHORT).show();
+                        mMap.clear();
+                        updateLocationUI();
+
+                        LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                        searchCircle = mMap.addCircle(new CircleOptions().center(currentLocation).radius(searchRadius * 1000));
+                        searchCircle.setFillColor(Color.argb(40, 66, 133, 244));
+                        searchCircle.setStrokeColor(Color.argb(75, 57, 115, 211));
+                        currentMarkerOptions = new MarkerOptions()
+                                .position(currentLocation)
+                                .title(getResources().getString(R.string.current_location))
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.pin_current_blue));
+                        mMap.addMarker(currentMarkerOptions);
+                        alert.dismiss();
+
+                    }
+                });
 
             }
         });
@@ -249,7 +324,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.hasChild(mAuth.getCurrentUser().getUid())) {
-                        Toast.makeText(MainActivity.this, "You need to setup your account", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.config_account), Toast.LENGTH_SHORT).show();
                         //startActivity(new Intent(MainActivity.this, SetupActivity.class));
                     }
                 }
@@ -269,11 +344,11 @@ public class MainActivity extends AppCompatActivity
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        Log.d(TAG, "El usuario permitió el cambio de ajustes de ubicación.");
+                        Log.d(TAG, getResources().getString(R.string.allowed_user));
                         processLastLocation();
                         break;
                     case Activity.RESULT_CANCELED:
-                        Log.d(TAG, "El usuario no permitió el cambio de ajustes de ubicación");
+                        Log.d(TAG, getResources().getString(R.string.user_did_not_allow));
                         break;
                 }
                 break;
@@ -290,7 +365,7 @@ public class MainActivity extends AppCompatActivity
         if (mLastLocation != null) {
             mMap.addMarker(currentMarkerOptions = new MarkerOptions()
                     .position(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
-                    .title("Current location")
+                    .title(getResources().getString(R.string.current_location))
                     .icon(BitmapDescriptorFactory.fromResource(R.mipmap.pin_current_blue)));
         }
 
@@ -353,15 +428,23 @@ public class MainActivity extends AppCompatActivity
 
             startActivity(new Intent(MainActivity.this, VetIndexActivity.class));
 
-        } else if (id == R.id.nav_animal_shelters) {
+        } /*else if (id == R.id.nav_animal_shelters) {
 
             startActivity(new Intent(MainActivity.this, ShelterIndexActivity.class));
 
-        } /*else if (id == R.id.nav_stray_animal) {
+        } else if (id == R.id.nav_stray_animal) {
 
             startActivity(new Intent(MainActivity.this, StrayIndexActivity.class));
 
-        }*/ else if (id == R.id.nav_settings) {
+        }*/ else if (id == R.id.nav_my_pets) {
+
+            startActivity(new Intent(MainActivity.this, MyPetsActivity.class));
+
+        } else if (id == R.id.nav_my_vets) {
+
+            startActivity(new Intent(MainActivity.this, MyVetsActivity.class));
+
+        } else if (id == R.id.nav_settings) {
 
             startActivity(new Intent(MainActivity.this, SetupActivity.class));
 
@@ -403,7 +486,7 @@ public class MainActivity extends AppCompatActivity
 
         currentMarkerOptions = new MarkerOptions()
                 .position(currentLocation)
-                .title("Current location")
+                .title(getResources().getString(R.string.current_location))
                 //.snippet("Parque de Cuidad Quesada")
                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.pin_current_blue));
         //.anchor(0.0f, 1.0f);
@@ -431,7 +514,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, String.format("Nueva ubicación: (%s, %s)",
+        Log.d(TAG, String.format( getResources().getString(R.string.new_location)+ " (%s, %s)",
                 location.getLatitude(), location.getLongitude()));
         mLastLocation = location;
         updateLocationUI();
@@ -464,10 +547,10 @@ public class MainActivity extends AppCompatActivity
                     //Toast.makeText(this, String.valueOf(mLastLocation.getLongitude()), Toast.LENGTH_LONG).show();
 
                 } else {
-                    Toast.makeText(this, "Ubicación no encontrada", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getResources().getString(R.string.location_not_found), Toast.LENGTH_LONG).show();
                 }
             } else {
-                Toast.makeText(this, "Permisos no otorgados", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getResources().getString(R.string.permissions), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -477,7 +560,7 @@ public class MainActivity extends AppCompatActivity
         if (mLastLocation != null) {
             updateLocationUI();
         } else {
-            Log.i(TAG, "Localización nula");
+            Log.i(TAG, getResources().getString(R.string.null_location));
         }
     }
 
@@ -513,8 +596,8 @@ public class MainActivity extends AppCompatActivity
 
     private void updateLocationUI() {
 
-        Log.i("Latitude", String.valueOf(mLastLocation.getLatitude()));
-        Log.i("Longitude", String.valueOf(mLastLocation.getLongitude()));
+        Log.i(getResources().getString(R.string.latitude), String.valueOf(mLastLocation.getLatitude()));
+        Log.i(getResources().getString(R.string.longitude), String.valueOf(mLastLocation.getLongitude()));
 
         geoQuery = geoFire.queryAtLocation(new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), searchRadius);
         this.geoQuery.addGeoQueryEventListener(this);
@@ -525,7 +608,6 @@ public class MainActivity extends AppCompatActivity
                 public void onMapReady(GoogleMap googleMap) {
                     //mapa
                     mMap = googleMap;
-                    //mMap.clear();
                     LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                     if (currentMarker == null) {
                         currentMarker = mMap.addMarker(currentMarkerOptions);
@@ -553,7 +635,6 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(LOCATION_KEY)) {
                 mLastLocation = savedInstanceState.getParcelable(LOCATION_KEY);
-                //updateLocationUI();
             }
         }
     }
@@ -585,7 +666,11 @@ public class MainActivity extends AppCompatActivity
         // Add a new marker to the map
         Marker marker = this.mMap.addMarker(new MarkerOptions().position(new LatLng(location.latitude, location.longitude)));
         marker.setTag(key); //animal_id
-        marker.setIcon((BitmapDescriptorFactory.fromResource(R.mipmap.pin_animal)));
+        if (String.valueOf(key).substring(0, 3).equals("pet")) {
+            marker.setIcon((BitmapDescriptorFactory.fromResource(R.mipmap.pin_animal)));
+        } else {
+            marker.setIcon((BitmapDescriptorFactory.fromResource(R.mipmap.pin_vet)));
+        }
         this.markers.put(key, marker);
 
     }
@@ -619,27 +704,33 @@ public class MainActivity extends AppCompatActivity
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+
                 if (marker.getTag() != null) {
-                    goSingleActivity(String.valueOf(marker.getTag()));
+
+                    String cadena = String.valueOf(marker.getTag()).substring(3);
+
+                    if (String.valueOf(marker.getTag()).substring(0, 3).equals("pet")) {
+
+                        Intent intent = new Intent(MainActivity.this, PetSingleActivity.class);
+                        intent.putExtra("pet_id", cadena);
+                        startActivity(intent);
+
+                    } else {
+                        Intent intent = new Intent(MainActivity.this, VetSingleActivity.class);
+                        intent.putExtra("vet_id", cadena);
+                        startActivity(intent);
+                    }
                 }
                 return false;
             }
         });
     }
 
-    public void goSingleActivity(String pet_id) {
-
-        Intent intent = new Intent(MainActivity.this, PetSingleActivity.class);
-        intent.putExtra("pet_id", pet_id);
-        startActivity(intent);
-
-    }
-
     @Override
     public void onGeoQueryError(DatabaseError error) {
         new AlertDialog.Builder(this)
                 .setTitle("Error")
-                .setMessage("There was an unexpected error querying GeoFire: " + error.getMessage())
+                .setMessage(getResources().getString(R.string.error_geofire) + error.getMessage())
                 .setPositiveButton(android.R.string.ok, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
@@ -676,12 +767,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onConnectionSuspended(int i) {
-        Toast.makeText(this, "Connection suspended...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getResources().getString(R.string.connection_suspended), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(this, "Failed to connect...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getResources().getString(R.string.failed_to_connect), Toast.LENGTH_SHORT).show();
     }
 
     //////////////////////////////////////////////////////////PERMISOS/////////////////////////////////////////////////////////////

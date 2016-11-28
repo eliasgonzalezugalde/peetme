@@ -7,23 +7,24 @@ package peetme.app.trunimal.com.peetme;
 public class Vet {
 
     //reports
-    String name, ubication, phone, facebook, image, schedule, schedule2;
+    String name, phone, image,reports;
     Boolean active, open247;
 
     public Vet() {
     }
 
-    public Vet(String name, String ubication, String phone, String facebook, String image, String schedule, String schedule2, Boolean active, Boolean open247) {
+    public Vet(String name, String phone, String image, Boolean active, Boolean open247,String reports) {
         this.name = name;
-        this.ubication = ubication;
         this.phone = phone;
-        this.facebook = facebook;
         this.image = image;
-        this.schedule = schedule;
-        this.schedule2 = schedule2;
         this.active = active;
         this.open247 = open247;
+        this.reports = reports;
     }
+
+    public String getReports() { return reports; }
+
+    public void setReports(String reports) { this.reports = reports; }
 
     public String getName() {
         return name;
@@ -31,14 +32,6 @@ public class Vet {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getUbication() {
-        return ubication;
-    }
-
-    public void setUbication(String ubication) {
-        this.ubication = ubication;
     }
 
     public String getPhone() {
@@ -49,36 +42,12 @@ public class Vet {
         this.phone = phone;
     }
 
-    public String getFacebook() {
-        return facebook;
-    }
-
-    public void setFacebook(String facebook) {
-        this.facebook = facebook;
-    }
-
     public String getImage() {
         return image;
     }
 
     public void setImage(String image) {
         this.image = image;
-    }
-
-    public String getSchedule() {
-        return schedule;
-    }
-
-    public void setSchedule(String schedule) {
-        this.schedule = schedule;
-    }
-
-    public String getSchedule2() {
-        return schedule2;
-    }
-
-    public void setSchedule2(String schedule2) {
-        this.schedule2 = schedule2;
     }
 
     public Boolean getActive() {
