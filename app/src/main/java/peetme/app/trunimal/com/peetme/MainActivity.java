@@ -1,6 +1,7 @@
 package peetme.app.trunimal.com.peetme;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -36,6 +37,8 @@ import android.view.animation.Interpolator;
 import android.os.Handler;
 
 import com.facebook.login.LoginManager;
+import com.fastaccess.permission.base.PermissionHelper;
+import com.fastaccess.permission.base.callback.OnPermissionCallback;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -76,28 +79,27 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        //OnPermissionCallback,
+        OnPermissionCallback,
         GeoQueryEventListener,
         LocationListener {
 
     private static final String LOCATION_KEY = "LK";
-    private static final String RADIUS_KEY = "LR";
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-    private DatabaseReference mDatabasePetLocations;
+    private DatabaseReference mDatabaseLocations;
     private DatabaseReference mDatabaseUsers;
     private GeoFire geoFire;
     private GeoQuery geoQuery;
     private AlertDialog.Builder builder = null;
-    //private final String PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
-    //private PermissionHelper permissionHelper;
+    private final String PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
+    private PermissionHelper permissionHelper;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private TextView emailTextView, nameTextView;
     private Map<String, Marker> markers;
-    private Circle searchCircle;
+    private Circle circle;
     private LocationRequest locationRequest;
     private static final int REQUEST_LOCATION = 5;
     private static final String TAG = "LOCATION_ACTIVITY";
@@ -109,6 +111,7 @@ public class MainActivity extends AppCompatActivity
     private ImageButton locationBtn, radiusBtn;
     private int searchRadius;
     private int progress = 4;
+    private LatLng currentLocation;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -128,18 +131,21 @@ public class MainActivity extends AppCompatActivity
 
         locationBtn = (ImageButton) findViewById(R.id.locationBtn);
         radiusBtn = (ImageButton) findViewById(R.id.radiusBtn);
+        searchRadius = 4;
+        mapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map));
+        permissionHelper = PermissionHelper.getInstance(this);
+        permissionHelper.setForceAccepting(false).request(PERMISSION);
 
-        mDatabasePetLocations = FirebaseDatabase.getInstance().getReference().child("locations");
-        mDatabasePetLocations.keepSynced(true);
+        mDatabaseLocations = FirebaseDatabase.getInstance().getReference().child("locations");
+        mDatabaseLocations.keepSynced(true);
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("users");
         mDatabaseUsers.keepSynced(true);
-        geoFire = new GeoFire(mDatabasePetLocations);
+        geoFire = new GeoFire(mDatabaseLocations);
+        currentLocation = null;
 
-
-        View hView = navigationView.getHeaderView(0);
-        emailTextView = (TextView) hView.findViewById(R.id.emailTextView);
-        nameTextView = (TextView) hView.findViewById(R.id.nameTextView);
-        searchRadius = 4; //kilometers
+        View drawerView = navigationView.getHeaderView(0);
+        emailTextView = (TextView) drawerView.findViewById(R.id.emailTextView);
+        nameTextView = (TextView) drawerView.findViewById(R.id.nameTextView);
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -156,15 +162,12 @@ public class MainActivity extends AppCompatActivity
             }
         };
 
-        mapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map));
-
-        //permissionHelper = PermissionHelper.getInstance(this);
-        //permissionHelper.setForceAccepting(false).request(PERMISSION);
-
         //Google Play Services & Get the Last Known Location
         buildGoogleApiClient();
+
         //getting location savedInstanceState
         updateValuesFromBundle(savedInstanceState);
+
         // setup markers
         this.markers = new HashMap<String, Marker>();
 
@@ -204,8 +207,8 @@ public class MainActivity extends AppCompatActivity
         result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
             public void onResult(@NonNull LocationSettingsResult result) {
-                Status status = result.getStatus();
 
+                Status status = result.getStatus();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
                         Log.d(TAG, getResources().getString(R.string.location_1));
@@ -230,8 +233,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
-        checkUserExist();
+        //checkUserExist();
 
         locationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -248,7 +250,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
 
-                View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_image, null);
+                View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_update_radius, null);
                 final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder
                         .setTitle(getResources().getString(R.string.set_range))
@@ -294,14 +296,14 @@ public class MainActivity extends AppCompatActivity
                 buttonRange.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(MainActivity.this, getResources().getString(R.string.range), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.range_updated), Toast.LENGTH_SHORT).show();
                         mMap.clear();
                         updateLocationUI();
 
                         LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                        searchCircle = mMap.addCircle(new CircleOptions().center(currentLocation).radius(searchRadius * 1000));
-                        searchCircle.setFillColor(Color.argb(40, 66, 133, 244));
-                        searchCircle.setStrokeColor(Color.argb(75, 57, 115, 211));
+                        circle = mMap.addCircle(new CircleOptions().center(currentLocation).radius(searchRadius * 1000));
+                        circle.setFillColor(Color.argb(40, 66, 133, 244));
+                        circle.setStrokeColor(Color.argb(75, 57, 115, 211));
                         currentMarkerOptions = new MarkerOptions()
                                 .position(currentLocation)
                                 .title(getResources().getString(R.string.current_location))
@@ -324,6 +326,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.hasChild(mAuth.getCurrentUser().getUid())) {
+                        //superposicion
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.config_account), Toast.LENGTH_SHORT).show();
                         //startActivity(new Intent(MainActivity.this, SetupActivity.class));
                     }
@@ -358,9 +361,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
 
+        super.onStart();
         mGoogleApiClient.connect();
         mAuth.addAuthStateListener(mAuthListener);
-        super.onStart();
 
         if (mLastLocation != null) {
             mMap.addMarker(currentMarkerOptions = new MarkerOptions()
@@ -477,12 +480,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
+        if (isLocationPermissionGranted()) {
+            iniciateLocation();
+        }
+
+    }
+
+    public void iniciateLocation() {
         // Obtenemos la última ubicación al ser la primera vez
         processLastLocation();
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
 
-        LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
         currentMarkerOptions = new MarkerOptions()
                 .position(currentLocation)
@@ -499,40 +509,41 @@ public class MainActivity extends AppCompatActivity
         //mMap.setMyLocationEnabled(true);
 
         //circulo
-        searchCircle = this.mMap.addCircle(new CircleOptions().center(currentLocation).radius(searchRadius * 1000));
-        searchCircle.setFillColor(Color.argb(40, 66, 133, 244));
-        searchCircle.setStrokeColor(Color.argb(75, 57, 115, 211));
+        circle = this.mMap.addCircle(new CircleOptions().center(currentLocation).radius(searchRadius * 1000));
+        circle.setFillColor(Color.argb(40, 66, 133, 244));
+        circle.setStrokeColor(Color.argb(75, 57, 115, 211));
         //rojo
-        //searchCircle.setFillColor(Color.argb(40, 229, 50, 29));
-        //searchCircle.setStrokeColor(Color.argb(75, 229, 50, 29));
+        //circle.setFillColor(Color.argb(40, 229, 50, 29));
+        //circle.setStrokeColor(Color.argb(75, 229, 50, 29));
 
 
         // Iniciamos las actualizaciones de ubicación
         startLocationUpdates();
-
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, String.format( getResources().getString(R.string.new_location)+ " (%s, %s)",
+        Log.d(TAG, String.format(getResources().getString(R.string.new_location) + " (%s, %s)",
                 location.getLatitude(), location.getLongitude()));
         mLastLocation = location;
         updateLocationUI();
     }
 
     private void startLocationUpdates() {
-        if (isLocationPermissionGranted()) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mGoogleApiClient, locationRequest, this);
-        } else {
-            manageDeniedPermission();
+        //if (isLocationPermissionGranted()) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, locationRequest, this);
+        //} else {
+        //manageDeniedPermission();
+        //}
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        /*
         if (requestCode == REQUEST_LOCATION) {
             if (grantResults.length == 1
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -550,9 +561,11 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(this, getResources().getString(R.string.location_not_found), Toast.LENGTH_LONG).show();
                 }
             } else {
-                Toast.makeText(this, getResources().getString(R.string.permissions), Toast.LENGTH_LONG).show();
+                //superposicion
+                //Toast.makeText(this, getResources().getString(R.string.permissions), Toast.LENGTH_LONG).show();
             }
         }
+        */
     }
 
     private void processLastLocation() {
@@ -565,14 +578,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getLastLocation() {
-        if (isLocationPermissionGranted()) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        } else {
-            manageDeniedPermission();
+        //if (isLocationPermissionGranted()) {
+//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                return;
+//            }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        //} else {
+        //manageDeniedPermission();
+        //}
     }
 
     private boolean isLocationPermissionGranted() {
@@ -582,6 +598,7 @@ public class MainActivity extends AppCompatActivity
         return permission == PackageManager.PERMISSION_GRANTED;
     }
 
+    /*
     private void manageDeniedPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -593,7 +610,7 @@ public class MainActivity extends AppCompatActivity
                     REQUEST_LOCATION);
         }
     }
-
+    */
     private void updateLocationUI() {
 
         Log.i(getResources().getString(R.string.latitude), String.valueOf(mLastLocation.getLatitude()));
@@ -608,13 +625,13 @@ public class MainActivity extends AppCompatActivity
                 public void onMapReady(GoogleMap googleMap) {
                     //mapa
                     mMap = googleMap;
-                    LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                    currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                     if (currentMarker == null) {
                         currentMarker = mMap.addMarker(currentMarkerOptions);
                     } else {
                         currentMarker.setPosition(currentLocation);
                         //borrar circulo
-                        searchCircle.setCenter(currentLocation);
+                        circle.setCenter(currentLocation);
                     }
 
                 }
@@ -650,9 +667,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        if (mGoogleApiClient.isConnected()) {
-            stopLocationUpdates();
-        }
+//        if (mGoogleApiClient.isConnected()) {
+//            stopLocationUpdates();
+//        }
     }
 
     protected void stopLocationUpdates() {
@@ -776,10 +793,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     //////////////////////////////////////////////////////////PERMISOS/////////////////////////////////////////////////////////////
-    /*
+
     @Override
     public void onPermissionGranted(@NonNull String[] permissionName) {
-
+        iniciateLocation();
     }
 
     @Override
@@ -794,6 +811,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onPermissionNeedExplanation(@NonNull String permissionName) {
+        //traducir
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("We need your help")
                 .setMessage("We use your location to show animal shelters or veterinary who are near you.")
@@ -816,7 +834,7 @@ public class MainActivity extends AppCompatActivity
     public void onNoPermissionNeeded() {
 
     }
-    */
+
     //////////////////////////////////////////////////////////API GOOGLE/////////////////////////////////////////////////////////////
 
     protected synchronized void buildGoogleApiClient() {

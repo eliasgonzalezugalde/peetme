@@ -186,7 +186,7 @@ public class PetCreateActivity extends AppCompatActivity implements
 
                 /*
                 //MODAL DE GALERÍA Y CÁMARA
-                View view = LayoutInflater.from(PetCreateActivity.this).inflate(R.layout.dialog_image, null);
+                View view = LayoutInflater.from(PetCreateActivity.this).inflate(R.layout.dialog_update_radius, null);
                 final AlertDialog.Builder builder = new AlertDialog.Builder(PetCreateActivity.this);
                 builder
                         .setTitle(getResources().getString(R.string.add_image_from))

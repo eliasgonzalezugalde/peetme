@@ -44,7 +44,7 @@
     <string id="location_3" name="location_3">Dialogue Intent does not work.</string>
     <string id="location_4" name="location_4">Location settings are not appropriate.</string>
     <string id="set_range" name="set_range">Select the search range</string>
-    <string id="range" name="range">Range</string>
+    <string id="range_updated" name="range_updated">Search range updated</string>
     <string id="current_location" name="current_location">Current location.</string>
     <string id="config_account" name="config_account">You need to setup your account.</string>
     <string id="allowed_user" name="allowed_user">The user allowed the change of location settings.</string>

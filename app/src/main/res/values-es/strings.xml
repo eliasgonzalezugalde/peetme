@@ -44,7 +44,7 @@
     <string id="location_3" name="location_3">El Intent del diálogo no funcionó.</string>
     <string id="location_4" name="location_4">Los ajustes de ubicación no son apropiados.</string>
     <string id="set_range" name="set_range">Seleccionar el rango de búsqueda</string>
-    <string id="range" name="range">Rango</string>
+    <string id="range_updated" name="range_updated">Rango de búsqueda actualizado</string>
     <string id="current_location" name="current_location">Ubicacion actual.</string>
     <string id="config_account" name="config_account">Necesitas configurar tu cuenta.</string>
     <string id="allowed_user" name="allowed_user">El usuario permitió el cambio de ajustes de ubicación.</string>
