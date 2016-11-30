@@ -68,6 +68,7 @@
     <string id="are_you_sure_delete" name="are_you_sure_delete">¿Estás seguro de que quieres eliminar este animal?</string>
     <string id="confirm_delete" name="confirm_delete">Borrar</string>
     <string id="animal_deleted" name="animal_deleted">Animal borrado</string>
+    <string name="vet_deleted" id="vet_deleted">Veterinaria borrada</string>
 
     <string id="add_image_from" name="add_image_from">Agregar imagen desde</string>
     <string id="camera" name="camera">Camara</string>
@@ -111,6 +112,7 @@
     <string name="image_not_found" id="image_not_found">Imagen no encontrada</string>
 
     <string name="phone" id="phone">Teléfono</string>
+    <string name="phone_hint" id="phone_hint">Tu número de teléfono</string>
     <string name="open247" id="open247">Abierto 24/7</string>
     <string name="yes" id="yes">Si</string>
     <string name="no" id="no">No</string>

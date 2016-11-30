@@ -98,7 +98,11 @@ public class MyPetsActivity extends AppCompatActivity {
                 viewHolder.editBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(MyPetsActivity.this, "Edit", Toast.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(MyPetsActivity.this, PetCreateActivity.class);
+                        intent.putExtra("pet_id", pet_id);
+                        startActivity(intent);
+
                     }
                 });
 
@@ -118,6 +122,11 @@ public class MyPetsActivity extends AppCompatActivity {
     }
 
     private void goSingleActivity(String pet_id) {
+
+        Intent intent = new Intent(MyPetsActivity.this, PetSingleActivity.class);
+        intent.putExtra("pet_id", pet_id);
+        startActivity(intent);
+
     }
 
     @Override

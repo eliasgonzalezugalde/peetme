@@ -68,6 +68,7 @@
     <string name="are_you_sure_delete" id="are_you_sure_delete">Are you sure you want to delete this animal?</string>
     <string name="confirm_delete" id="confirm_delete">Confirm Delete</string>
     <string name="animal_deleted" id="animal_deleted">Animal deleted</string>
+    <string name="vet_deleted" id="vet_deleted">Vet deleted</string>
 
 
     <string name="add_image_from" id="add_image_from">Add image from</string>
@@ -112,6 +113,7 @@
     <string name="image_not_found" id="image_not_found">Image not found</string>
 
     <string name="phone" id="phone">Phone</string>
+    <string name="phone_hint" id="phone_hint">Your phone number</string>
     <string name="open247" id="open247">Open 24/7</string>
     <string name="yes" id="yes">Yes</string>
     <string name="no" id="no">No</string>

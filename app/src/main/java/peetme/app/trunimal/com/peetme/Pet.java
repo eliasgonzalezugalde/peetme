@@ -1,9 +1,5 @@
 package peetme.app.trunimal.com.peetme;
 
-import com.google.android.gms.maps.model.LatLng;
-
-import java.util.Date;
-
 /**
  * Created by elias on 21/9/2016.
  */
@@ -11,27 +7,28 @@ import java.util.Date;
 public class Pet {
 
     private int userId;
-    private  String name, description, image, species, gender, size, health, additionalInfo, ubication, modifiedDate, createdDate, age, reports;
+    private  String name, description, image, additionalInfo, phone, modifiedDate, createdDate;
+    private int species, gender, size, health, age, reports;
     private Boolean castrated, wormed, vaccinated, adopted, active;
 
     public Pet() {
     }
 
-    public Pet(int userId, String age, String reports, String name, String description, String image, String species, String breed, String gender, String size, String health, String additionalInfo, String modifiedDate, String createdDate, String ubication, Boolean castrated, Boolean wormed, Boolean vaccinated, Boolean adopted, Boolean active) {
+    public Pet(int userId, String name, String description, String image, String additionalInfo, String phone, String modifiedDate, String createdDate, int species, int gender, int size, int health, int age, int reports, Boolean castrated, Boolean wormed, Boolean vaccinated, Boolean adopted, Boolean active) {
         this.userId = userId;
-        this.age = age;
-        this.reports = reports;
         this.name = name;
         this.description = description;
         this.image = image;
+        this.additionalInfo = additionalInfo;
+        this.phone = phone;
+        this.modifiedDate = modifiedDate;
+        this.createdDate = createdDate;
         this.species = species;
         this.gender = gender;
         this.size = size;
         this.health = health;
-        this.additionalInfo = additionalInfo;
-        this.modifiedDate = modifiedDate;
-        this.createdDate = createdDate;
-        this.ubication = ubication;
+        this.age = age;
+        this.reports = reports;
         this.castrated = castrated;
         this.wormed = wormed;
         this.vaccinated = vaccinated;
@@ -39,30 +36,12 @@ public class Pet {
         this.active = active;
     }
 
-
-
     public int getUserId() {
         return userId;
     }
 
     public void setUserId(int userId) {
         this.userId = userId;
-    }
-
-    public String getAge() {
-        return age;
-    }
-
-    public void setAge(String age) {
-        this.age = age;
-    }
-
-    public String getReports() {
-        return reports;
-    }
-
-    public void setReports(String reports) {
-        this.reports = reports;
     }
 
     public String getName() {
@@ -89,44 +68,20 @@ public class Pet {
         this.image = image;
     }
 
-    public String getSpecies() {
-        return species;
-    }
-
-    public void setSpecies(String species) {
-        this.species = species;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-    public String getHealth() {
-        return health;
-    }
-
-    public void setHealth(String health) {
-        this.health = health;
-    }
-
     public String getAdditionalInfo() {
         return additionalInfo;
     }
 
     public void setAdditionalInfo(String additionalInfo) {
         this.additionalInfo = additionalInfo;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getModifiedDate() {
@@ -145,12 +100,52 @@ public class Pet {
         this.createdDate = createdDate;
     }
 
-    public String getUbication() {
-        return ubication;
+    public int getSpecies() {
+        return species;
     }
 
-    public void setUbication(String ubication) {
-        this.ubication = ubication;
+    public void setSpecies(int species) {
+        this.species = species;
+    }
+
+    public int getGender() {
+        return gender;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public int getReports() {
+        return reports;
+    }
+
+    public void setReports(int reports) {
+        this.reports = reports;
     }
 
     public Boolean getCastrated() {

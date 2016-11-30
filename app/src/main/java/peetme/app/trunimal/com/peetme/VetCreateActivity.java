@@ -29,12 +29,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -85,18 +88,61 @@ public class VetCreateActivity extends AppCompatActivity implements
         submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startPosting();
+                if (getIntent().hasExtra("vet_id")){
+                    startUpdate();
+                } else {
+                    startPosting();
+                }
+
             }
         });
+
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivityForResult(CropImage.getPickImageChooserIntent(VetCreateActivity.this, getResources().getString(R.string.add_image_from), true), 200);
             }
         });
+
         //Google Play Services & Get the Last Known Location
         buildGoogleApiClient();
 
+        if (getIntent().hasExtra("vet_id")) {
+
+            fillFields();
+
+        }
+
+    }
+
+    private void fillFields() {
+
+        mDatabaseVet.child(getIntent().getExtras().getString("vet_id")).addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Picasso.with(VetCreateActivity.this).load((String) dataSnapshot.child("image").getValue()).into(selectImage);
+                nameField.setText((String) dataSnapshot.child("name").getValue());
+                phoneField.setText((String) dataSnapshot.child("phone").getValue());
+                if ((Boolean) dataSnapshot.child("open247").getValue()) {
+                    switchOpen247.setChecked(true);
+                }
+                getSupportActionBar().setTitle((String) dataSnapshot.child("name").getValue());
+
+            }
+            @Override
+
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
+
+    }
+
+    private void startUpdate() {
+        Toast.makeText(this, "startUpdate()", Toast.LENGTH_SHORT).show();
     }
 
     private void startPosting() {
@@ -119,7 +165,7 @@ public class VetCreateActivity extends AppCompatActivity implements
         if (!TextUtils.isEmpty(name_val)) {
 
             //StorageReference filepath = mStorage.child("Pet_Images").child(imageUri.getLastPathSegment());
-            StorageReference filepath = mStorage.child("Pet_Images").child(randomString());
+            StorageReference filepath = mStorage.child("Images").child("vet" + randomString());
 
             filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override

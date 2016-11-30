@@ -23,7 +23,7 @@ public class PetSingleActivity extends AppCompatActivity {
     private ImageView petImage;
     private TextView textViewName, textViewCreatedDate, textViewDescription, textViewAge,
             textViewGender, textViewSize, textViewHealth, textViewCastrated, textViewVaccinated,
-            textViewWormed, textViewAdditionalInfo, textViewSpecies, textViewAdopted;
+            textViewWormed, textViewAdditionalInfo, textViewSpecies, textViewAdopted, textViewPhone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,29 +49,99 @@ public class PetSingleActivity extends AppCompatActivity {
         textViewAdditionalInfo = (TextView) findViewById(R.id.textViewAdditionalInfo);
         textViewSpecies = (TextView) findViewById(R.id.textViewSpecies);
         textViewAdopted = (TextView) findViewById(R.id.textViewAdopted);
+        textViewPhone = (TextView) findViewById(R.id.textViewPhone);
 
         mDatabaseReference.child(pet_id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                getSupportActionBar().setTitle((String) dataSnapshot.child("name").getValue());
+
                 Picasso.with(PetSingleActivity.this).load((String) dataSnapshot.child("image").getValue()).into(petImage);
                 textViewName.setText((String) dataSnapshot.child("name").getValue());
                 textViewCreatedDate.setText((String) dataSnapshot.child("createdDate").getValue());
                 textViewDescription.setText((String) dataSnapshot.child("description").getValue());
-                textViewAge.setText((String) dataSnapshot.child("age").getValue());
-                textViewGender.setText((String) dataSnapshot.child("gender").getValue());
-                textViewSize.setText((String) dataSnapshot.child("name").getValue());
-                textViewHealth.setText((String) dataSnapshot.child("health").getValue());
                 textViewAdditionalInfo.setText((String) dataSnapshot.child("info").getValue());
-                textViewSpecies.setText((String) dataSnapshot.child("species").getValue());
-                getSupportActionBar().setTitle((String) dataSnapshot.child("name").getValue());
+                textViewPhone.setText((String) dataSnapshot.child("phone").getValue());
 
-                /*
-                textViewCastrated.setText((String) dataSnapshot.child("castrated").getValue());
-                textViewVaccinated.setText((String) dataSnapshot.child("vaccinated").getValue());
-                textViewWormed.setText((String) dataSnapshot.child("wormed").getValue());
-                textViewAdopted.setText((String) dataSnapshot.child("adopted").getValue());
-                */
+                long number = 0;
+                number = (long) dataSnapshot.child("age").getValue();
+                if (number == 1) {
+                    textViewAge.setText(getResources().getString(R.string.select_age_puppy));
+                } else if (number == 2) {
+                    textViewAge.setText(getResources().getString(R.string.select_age_young));
+                } else if (number == 3) {
+                    textViewAge.setText(getResources().getString(R.string.select_age_adult));
+                } else {
+                    textViewAge.setText(getResources().getString(R.string.select_age_old));
+                }
+
+                number = (long) dataSnapshot.child("gender").getValue();
+                if (number == 1) {
+                    textViewGender.setText(getResources().getString(R.string.male));
+                } else {
+                    textViewGender.setText(getResources().getString(R.string.female));
+                }
+
+                number = (long) dataSnapshot.child("size").getValue();
+                if (number == 1) {
+                    textViewSize.setText(getResources().getString(R.string.select_size_small));
+                } else if (number == 2) {
+                    textViewSize.setText(getResources().getString(R.string.select_size_medium));
+                } else {
+                    textViewSize.setText(getResources().getString(R.string.select_size_large));
+                }
+
+                number = (long) dataSnapshot.child("health").getValue();
+                if (number == 1) {
+                    textViewHealth.setText(getResources().getString(R.string.select_health_bad));
+                } else if (number == 2) {
+                    textViewHealth.setText(getResources().getString(R.string.select_health_ok));
+                } else {
+                    textViewHealth.setText(getResources().getString(R.string.select_health_good));
+                }
+
+                number = (long) dataSnapshot.child("species").getValue();
+                if (number == 1) {
+                    textViewSpecies.setText(getResources().getString(R.string.dog));
+                } else if (number == 2) {
+                    textViewSpecies.setText(getResources().getString(R.string.cat));
+                } else if (number == 3) {
+                    textViewSpecies.setText(getResources().getString(R.string.rabbit));
+                } else if (number == 4) {
+                    textViewSpecies.setText(getResources().getString(R.string.pig));
+                } else if (number == 5) {
+                    textViewSpecies.setText(getResources().getString(R.string.bird));
+                } else if (number == 6) {
+                    textViewSpecies.setText(getResources().getString(R.string.rodent));
+                } else {
+                    textViewSpecies.setText(getResources().getString(R.string.other));
+                }
+
+                if ((boolean) dataSnapshot.child("castrated").getValue()) {
+                    textViewCastrated.setText(getResources().getString(R.string.yes));
+                } else {
+                    textViewCastrated.setText(getResources().getString(R.string.no));
+                }
+
+                if ((boolean) dataSnapshot.child("vaccinated").getValue()) {
+                    textViewVaccinated.setText(getResources().getString(R.string.yes));
+                } else {
+                    textViewVaccinated.setText(getResources().getString(R.string.no));
+                }
+
+                if ((boolean) dataSnapshot.child("wormed").getValue()) {
+                    textViewWormed.setText(getResources().getString(R.string.yes));
+                } else {
+                    textViewWormed.setText(getResources().getString(R.string.no));
+                }
+
+                if ((boolean) dataSnapshot.child("adopted").getValue()) {
+                    textViewAdopted.setText(getResources().getString(R.string.yes));
+                } else {
+                    textViewAdopted.setText(getResources().getString(R.string.no));
+                }
+
             }
 
             @Override

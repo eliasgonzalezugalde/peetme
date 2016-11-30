@@ -38,12 +38,15 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -58,37 +61,27 @@ public class PetCreateActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int GALLERY_REQUEST = 1;
-    //private static final int REQUEST_IMAGE_CAPTURE = 2;
-
+    private static final String TAG = "PET_CREATE_ACTIVITY";
     private Date date;
     private CharSequence charSequence;
-
     private TextView textViewLocationResult;
     private ImageButton selectImage;
-    private EditText nameField, descField, additionalInfoField;
+    private EditText nameField, descField, additionalInfoField, phoneField;
     private Button submitBtn, locationBtn;
-
     private Uri imageUri = null;
     private StorageReference mStorage;
     private DatabaseReference mDatabasePet;
     private DatabaseReference mDatabasePetLocations;
     private ProgressDialog mProgress;
-
     private Spinner spinnerAge;
     private Spinner spinnerHealth;
     private Spinner spinnerSize;
     private Spinner spinnerSpecies;
     private Spinner spinnerGender;
-
     private Switch switchCastrated, switchVaccinated, switchWormed;
-
     private AlertDialog.Builder builder = null;
-
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-
-    //private FirebaseAuth mAuth;
-    //private FirebaseUser mCurrentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +101,7 @@ public class PetCreateActivity extends AppCompatActivity implements
         nameField = (EditText) findViewById(R.id.nameField);
         descField = (EditText) findViewById(R.id.descField);
         additionalInfoField = (EditText) findViewById(R.id.additionalInfoField);
+        phoneField = (EditText) findViewById(R.id.phoneField);
 
         switchCastrated = (Switch) findViewById(R.id.switchCastrated);
         switchVaccinated = (Switch) findViewById(R.id.switchVaccinated);
@@ -149,11 +143,11 @@ public class PetCreateActivity extends AppCompatActivity implements
         //Google Play Services & Get the Last Known Location
         buildGoogleApiClient();
 
-        //mAuth= FirebaseAuth.getInstance();
-        //mCurrentUser = mAuth.getCurrentUser();
+        if (getIntent().hasExtra("pet_id")) {
 
-        Log.i("GEO",String.valueOf(mDatabasePetLocations));
+            fillFields();
 
+        }
 
         /*
         spinnerSpecies.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -181,50 +175,7 @@ public class PetCreateActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
 
-                //https://github.com/ArthurHub/Android-Image-Cropper/wiki/Pick-image-for-cropping-from-Camera-or-Gallery
                 startActivityForResult(CropImage.getPickImageChooserIntent(PetCreateActivity.this, getResources().getString(R.string.add_image_from), true), 200);
-
-                /*
-                //MODAL DE GALERÍA Y CÁMARA
-                View view = LayoutInflater.from(PetCreateActivity.this).inflate(R.layout.dialog_update_radius, null);
-                final AlertDialog.Builder builder = new AlertDialog.Builder(PetCreateActivity.this);
-                builder
-                        .setTitle(getResources().getString(R.string.add_image_from))
-                        .setView(view);
-                TextView textView_camera = (TextView) view.findViewById(R.id.textView_camera);
-                TextView textView_gallery = (TextView) view.findViewById(R.id.textView_gallery);
-                final AlertDialog alert = builder.show();
-
-                textView_camera.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        //camara
-                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-
-                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-
-                        }
-                        //Toast.makeText(PetCreateActivity.this, "Open camera", Toast.LENGTH_SHORT).show();
-                        alert.dismiss();
-
-                    }
-                });
-
-                textView_gallery.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        //galería
-                        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT );
-                        galleryIntent.setType("image/*");
-                        startActivityForResult(galleryIntent, GALLERY_REQUEST);
-                        alert.dismiss();
-
-                    }
-                });*/
 
             }
         });
@@ -234,7 +185,12 @@ public class PetCreateActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
 
-                startPosting();
+                if (getIntent().hasExtra("pet_id")) {
+                    startUpdate();
+                } else {
+                    startPosting();
+                }
+
 
             }
         });
@@ -249,19 +205,65 @@ public class PetCreateActivity extends AppCompatActivity implements
                     //locationBtn.setTransformationMethod(null); //boton en minusculas
                     textViewLocationResult.setText(String.valueOf(getAddress(PetCreateActivity.this, mLastLocation).getAddressLine(0)));
                     textViewLocationResult.setVisibility(View.VISIBLE);
-                    Log.i("GET ADDRESS", String.valueOf(getAddress(PetCreateActivity.this, mLastLocation).getAddressLine(0)) + "n/" + String.valueOf(getAddress(PetCreateActivity.this, mLastLocation).getAddressLine(1)));
+                    Log.i(TAG, String.valueOf(getAddress(PetCreateActivity.this, mLastLocation).getAddressLine(0)) + "n/" + String.valueOf(getAddress(PetCreateActivity.this, mLastLocation).getAddressLine(1)));
                 } else {
-                    Log.i("", "NULL");
+                    Log.i(TAG, "mLastLocation is null");
                 }
 
             }
         });
-
         textViewLocationResult.setVisibility(View.GONE);
 
     }
 
+    private void fillFields() {
+
+        mDatabasePet.child(getIntent().getExtras().getString("pet_id")).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Picasso.with(PetCreateActivity.this).load((String) dataSnapshot.child("image").getValue()).into(selectImage);
+                spinnerSpecies.setSelection(((int)(long) dataSnapshot.child("species").getValue()));
+                nameField.setText((String) dataSnapshot.child("name").getValue());
+                descField.setText((String) dataSnapshot.child("description").getValue());
+                phoneField.setText((String) dataSnapshot.child("phone").getValue());
+                spinnerAge.setSelection(((int)(long) dataSnapshot.child("age").getValue()));
+                spinnerGender.setSelection(((int)(long) dataSnapshot.child("gender").getValue()));
+                spinnerSize.setSelection(((int)(long) dataSnapshot.child("size").getValue()));
+                spinnerHealth.setSelection(((int)(long) dataSnapshot.child("health").getValue()));
+
+                if ((boolean) dataSnapshot.child("castrated").getValue()) {
+                    switchCastrated.setChecked(true);
+                }
+
+                if ((boolean) dataSnapshot.child("vaccinated").getValue()) {
+                    switchVaccinated.setChecked(true);
+                }
+
+                if ((boolean) dataSnapshot.child("wormed").getValue()) {
+                    switchWormed.setChecked(true);
+                }
+
+                additionalInfoField.setText((String) dataSnapshot.child("info").getValue());
+
+                getSupportActionBar().setTitle((String) dataSnapshot.child("name").getValue());
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void startUpdate() {
+        Toast.makeText(this, "startUpdate()", Toast.LENGTH_SHORT).show();
+    }
+
     public static Address getAddress(final Context context, final Location location) {
+
         if (location == null)
             return null;
 
@@ -277,6 +279,7 @@ public class PetCreateActivity extends AppCompatActivity implements
             return addresses.get(0);
         else
             return null;
+
     }
 
     private void createDropdown(List<String> list, Spinner sniner) {
@@ -323,12 +326,7 @@ public class PetCreateActivity extends AppCompatActivity implements
         final String name_val = nameField.getText().toString().trim();
         final String desc_val = descField.getText().toString().trim();
         final String additional_info_val = additionalInfoField.getText().toString().trim();
-
-        final String age_val = spinnerAge.getSelectedItem().toString().trim();
-        final String species_val = spinnerSpecies.getSelectedItem().toString().trim();
-        final String gender_val = spinnerGender.getSelectedItem().toString().trim();
-        final String size_val = spinnerSize.getSelectedItem().toString().trim();
-        final String health_val = spinnerHealth.getSelectedItem().toString().trim();
+        final String phone_val = phoneField.getText().toString().trim();
 
         final boolean castrated_val;
         final boolean vaccinated_val;
@@ -352,21 +350,17 @@ public class PetCreateActivity extends AppCompatActivity implements
 
         if (!TextUtils.isEmpty(name_val)
                 && !TextUtils.isEmpty(desc_val)
+                && !TextUtils.isEmpty(phone_val)
                 && imageUri != null
                 //&& !TextUtils.isEmpty(additional_info_val)
-                && !TextUtils.isEmpty(age_val)
                 && spinnerAge.getSelectedItemPosition() != 0
-                && !TextUtils.isEmpty(species_val)
                 && spinnerSpecies.getSelectedItemPosition() != 0
-                && !TextUtils.isEmpty(gender_val)
                 && spinnerGender.getSelectedItemPosition() != 0
-                && !TextUtils.isEmpty(size_val)
                 && spinnerSize.getSelectedItemPosition() != 0
-                && !TextUtils.isEmpty(health_val)
                 && spinnerHealth.getSelectedItemPosition() != 0) {
             
             //StorageReference filepath = mStorage.child("Pet_Images").child(imageUri.getLastPathSegment());
-            StorageReference filepath = mStorage.child("Pet_Images").child("pet" + randomString());
+            StorageReference filepath = mStorage.child("Images").child("pet" + randomString());
 
             filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -376,24 +370,30 @@ public class PetCreateActivity extends AppCompatActivity implements
 
                     GeoFire geoFirePet = new GeoFire(mDatabasePetLocations);
                     DatabaseReference newPet = mDatabasePet.push();
-                    newPet.child("image").setValue(donwloadUrl.toString());
-                    newPet.child("species").setValue(species_val);
-                    newPet.child("name").setValue(nameField.getText().toString().trim());
-                    newPet.child("description").setValue(desc_val);
-                    newPet.child("age").setValue(age_val);
-                    newPet.child("gender").setValue(gender_val);
-                    newPet.child("size").setValue(size_val);
-                    newPet.child("health").setValue(health_val);
+
+                    newPet.child("active").setValue(true);
+                    newPet.child("adopted").setValue(false);
+                    newPet.child("age").setValue(spinnerAge.getSelectedItemPosition());
                     newPet.child("castrated").setValue(castrated_val);
+                    newPet.child("createdDate").setValue(String.valueOf(charSequence));
+                    newPet.child("description").setValue(desc_val);
+                    newPet.child("gender").setValue(spinnerGender.getSelectedItemPosition());
+                    newPet.child("health").setValue(spinnerHealth.getSelectedItemPosition());
+                    newPet.child("image").setValue(donwloadUrl.toString());
+                    newPet.child("info").setValue(additional_info_val);
+                    newPet.child("modifiedDate").setValue(String.valueOf(charSequence));
+                    newPet.child("name").setValue(nameField.getText().toString().trim());
+                    newPet.child("phone").setValue(phone_val);
+                    newPet.child("reports").setValue(0);
+                    newPet.child("size").setValue(spinnerSize.getSelectedItemPosition());
+                    if (spinnerSpecies.getSelectedItemPosition() == 0) {
+                        newPet.child("species").setValue(0);
+                    } else {
+                        newPet.child("species").setValue(spinnerSpecies.getSelectedItemPosition());
+                    }
+                    newPet.child("uid").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
                     newPet.child("vaccinated").setValue(vaccinated_val);
                     newPet.child("wormed").setValue(wormed_val);
-                    newPet.child("info").setValue(additional_info_val);
-                    newPet.child("reports").setValue("0");
-                    newPet.child("modifiedDate").setValue(String.valueOf(charSequence));
-                    newPet.child("createdDate").setValue(String.valueOf(charSequence));
-                    newPet.child("adopted").setValue(false);
-                    newPet.child("active").setValue(true);
-                    newPet.child("uid").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
                     geoFirePet.setLocation("pet" + newPet.getKey(), new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new GeoFire.CompletionListener() {
                         @Override
@@ -409,7 +409,6 @@ public class PetCreateActivity extends AppCompatActivity implements
                     mProgress.dismiss();
                     finish();
                     Toast.makeText(PetCreateActivity.this, getResources().getString(R.string.pet_saved), Toast.LENGTH_SHORT).show();
-                    //startActivity(new Intent(PetCreateActivity.this, PetIndexActivity.class));
 
                 }
             });
@@ -437,34 +436,22 @@ public class PetCreateActivity extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK) {
             imageUri = data.getData();
-
             startCropImageActivity(imageUri);
-
         }
-
-        //requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK //DIALOG
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == this.RESULT_OK) {
-
-            //Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
-            //imageUri = CropImage.getCaptureImageOutputUri(getApplicationContext());
-
             imageUri = CropImage.getPickImageResultUri(this, data);
             startCropImageActivity(imageUri);
-
         }
-
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-
                 imageUri = result.getUri();
                 selectImage.setImageURI(imageUri);
-
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
             }
@@ -473,10 +460,12 @@ public class PetCreateActivity extends AppCompatActivity implements
     }
 
     private void startCropImageActivity(Uri imageUri) {
+
         CropImage.activity(imageUri)
                 .setGuidelines(CropImageView.Guidelines.ON)
                 .setAspectRatio(4, 3)
                 .start(this);
+
     }
 
     @Override
@@ -485,10 +474,8 @@ public class PetCreateActivity extends AppCompatActivity implements
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-
         if (mLastLocation != null) {
             Log.i("Latitude", String.valueOf(mLastLocation.getLatitude()));
             Log.i("Longitude", String.valueOf(mLastLocation.getLongitude()));
@@ -497,6 +484,16 @@ public class PetCreateActivity extends AppCompatActivity implements
             Log.i("LOCATION PROBLEM", " --> NULL");
         }
 
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Toast.makeText(this, "Connection suspended...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, "Failed to connect...", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -509,16 +506,6 @@ public class PetCreateActivity extends AppCompatActivity implements
     protected void onStop() {
         mGoogleApiClient.disconnect();
         super.onStop();
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Toast.makeText(this, "Connection suspended...", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(this, "Failed to connect...", Toast.LENGTH_SHORT).show();
     }
 
     protected synchronized void buildGoogleApiClient() {
