@@ -35,6 +35,7 @@ import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -82,6 +83,8 @@ public class PetCreateActivity extends AppCompatActivity implements
     private AlertDialog.Builder builder = null;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
+    private String imgSaved;
+    private boolean imgChange;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +113,7 @@ public class PetCreateActivity extends AppCompatActivity implements
         submitBtn = (Button) findViewById(R.id.submitBtn);
         locationBtn = (Button) findViewById(R.id.locationBtn);
 
-        mProgress = new ProgressDialog(this);
+
 
         spinnerAge = (Spinner) findViewById(R.id.spinnerAge);
         spinnerHealth = (Spinner) findViewById(R.id.spinnerHealth);
@@ -139,6 +142,9 @@ public class PetCreateActivity extends AppCompatActivity implements
 
         date = new Date();
         charSequence = DateFormat.format("dd/MM/yyyy", date.getTime());
+        mProgress = new ProgressDialog(this);
+        imgSaved = "";
+        imgChange = false;
 
         //Google Play Services & Get the Last Known Location
         buildGoogleApiClient();
@@ -186,7 +192,8 @@ public class PetCreateActivity extends AppCompatActivity implements
             public void onClick(View v) {
 
                 if (getIntent().hasExtra("pet_id")) {
-                    startUpdate();
+                    String pet_id = getIntent().getStringExtra("pet_id");
+                    startUpdate(pet_id);
                 } else {
                     startPosting();
                 }
@@ -216,104 +223,79 @@ public class PetCreateActivity extends AppCompatActivity implements
 
     }
 
-    private void fillFields() {
+    private void startUpdate(final String pet_id) {
 
-        mDatabasePet.child(getIntent().getExtras().getString("pet_id")).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+        if (imgChange) {
 
-                Picasso.with(PetCreateActivity.this).load((String) dataSnapshot.child("image").getValue()).into(selectImage);
-                spinnerSpecies.setSelection(((int)(long) dataSnapshot.child("species").getValue()));
-                nameField.setText((String) dataSnapshot.child("name").getValue());
-                descField.setText((String) dataSnapshot.child("description").getValue());
-                phoneField.setText((String) dataSnapshot.child("phone").getValue());
-                spinnerAge.setSelection(((int)(long) dataSnapshot.child("age").getValue()));
-                spinnerGender.setSelection(((int)(long) dataSnapshot.child("gender").getValue()));
-                spinnerSize.setSelection(((int)(long) dataSnapshot.child("size").getValue()));
-                spinnerHealth.setSelection(((int)(long) dataSnapshot.child("health").getValue()));
+            mProgress.setMessage(getResources().getString(R.string.updating_info));
+            mProgress.show();
+            mProgress.setCancelable(false);
 
-                if ((boolean) dataSnapshot.child("castrated").getValue()) {
-                    switchCastrated.setChecked(true);
+            final StorageReference imgToDeleteRef = FirebaseStorage.getInstance().getReferenceFromUrl(imgSaved); //IMG TO DELETE
+
+            StorageReference filepath = mStorage.child("Images").child("pet" + randomString());
+
+            filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
+
+                    //SI SE SUVE LA NUEVA IMG
+                    imgToDeleteRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+
+                            //SI SE BORRA LA VIEJA IMG
+                            Uri donwloadUrl = taskSnapshot.getDownloadUrl();
+                            mDatabasePet.child(pet_id).child("image").setValue(donwloadUrl.toString());
+                            mProgress.dismiss();
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Uh-oh, an error occurred!
+                            mProgress.dismiss();
+                            Log.i(TAG, "Error deleting old img");
+                        }
+                    });
+
+
                 }
+            });
 
-                if ((boolean) dataSnapshot.child("vaccinated").getValue()) {
-                    switchVaccinated.setChecked(true);
-                }
-
-                if ((boolean) dataSnapshot.child("wormed").getValue()) {
-                    switchWormed.setChecked(true);
-                }
-
-                additionalInfoField.setText((String) dataSnapshot.child("info").getValue());
-
-                getSupportActionBar().setTitle((String) dataSnapshot.child("name").getValue());
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-    }
-
-    private void startUpdate() {
-        Toast.makeText(this, "startUpdate()", Toast.LENGTH_SHORT).show();
-    }
-
-    public static Address getAddress(final Context context, final Location location) {
-
-        if (location == null)
-            return null;
-
-        final Geocoder geocoder = new Geocoder(context);
-        final List<Address> addresses;
-        try {
-            addresses = geocoder.getFromLocation(location.getLatitude(),
-                    location.getLongitude(), 1);
-        } catch (IOException e) {
-            return null;
         }
-        if (addresses != null && !addresses.isEmpty())
-            return addresses.get(0);
-        else
-            return null;
 
-    }
+        //TODOS LOS DATOS
+        mDatabasePet.child(pet_id).child("name").setValue(nameField.getText().toString().trim());
+        mDatabasePet.child(pet_id).child("phone").setValue(phoneField.getText().toString().trim());
+        mDatabasePet.child(pet_id).child("description").setValue(descField.getText().toString().trim());
+        mDatabasePet.child(pet_id).child("info").setValue(additionalInfoField.getText().toString().trim());
 
-    private void createDropdown(List<String> list, Spinner sniner) {
+        mDatabasePet.child(pet_id).child("species").setValue(spinnerSpecies.getSelectedItemPosition());
+        mDatabasePet.child(pet_id).child("age").setValue(spinnerAge.getSelectedItemPosition());
+        mDatabasePet.child(pet_id).child("gender").setValue(spinnerGender.getSelectedItemPosition());
+        mDatabasePet.child(pet_id).child("size").setValue(spinnerSize.getSelectedItemPosition());
+        mDatabasePet.child(pet_id).child("health").setValue(spinnerHealth.getSelectedItemPosition());
 
-        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
-                this, R.layout.spinner_item, list) {
-            @Override
-            public boolean isEnabled(int position) {
-                if (position == 0) {
-                    // Disable the first item from Spinner
-                    // First item will be use for hint
-                    return false;
-                } else {
-                    return true;
-                }
-            }
+        if (switchCastrated.isChecked()) {
+            mDatabasePet.child(pet_id).child("castrated").setValue(true);
+        } else {
+            mDatabasePet.child(pet_id).child("castrated").setValue(false);
+        }
 
-            @Override
-            public View getDropDownView(int position, View convertView,
-                                        ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView tv = (TextView) view;
-                if (position == 0) {
-                    // Set the hint text color gray
-                    tv.setTextColor(Color.GRAY);
-                } else {
-                    tv.setTextColor(Color.BLACK);
-                }
-                return view;
-            }
-        };
+        if (switchVaccinated.isChecked()) {
+            mDatabasePet.child(pet_id).child("vaccinated").setValue(true);
+        } else {
+            mDatabasePet.child(pet_id).child("vaccinated").setValue(false);
+        }
 
-        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
-        sniner.setAdapter(spinnerArrayAdapter);
+        if (switchWormed.isChecked()) {
+            mDatabasePet.child(pet_id).child("wormed").setValue(true);
+        } else {
+            mDatabasePet.child(pet_id).child("wormed").setValue(false);
+        }
+
+        //UBICATION
 
     }
 
@@ -358,7 +340,7 @@ public class PetCreateActivity extends AppCompatActivity implements
                 && spinnerGender.getSelectedItemPosition() != 0
                 && spinnerSize.getSelectedItemPosition() != 0
                 && spinnerHealth.getSelectedItemPosition() != 0) {
-            
+
             //StorageReference filepath = mStorage.child("Pet_Images").child(imageUri.getLastPathSegment());
             StorageReference filepath = mStorage.child("Images").child("pet" + randomString());
 
@@ -420,6 +402,106 @@ public class PetCreateActivity extends AppCompatActivity implements
 
     }
 
+    private void fillFields() {
+
+        mDatabasePet.child(getIntent().getExtras().getString("pet_id")).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                //IMG FOR UPDATING
+                imgSaved = (String) dataSnapshot.child("image").getValue();
+
+                Picasso.with(PetCreateActivity.this).load(imgSaved).into(selectImage);
+                spinnerSpecies.setSelection(((int)(long) dataSnapshot.child("species").getValue()));
+                nameField.setText((String) dataSnapshot.child("name").getValue());
+                descField.setText((String) dataSnapshot.child("description").getValue());
+                phoneField.setText((String) dataSnapshot.child("phone").getValue());
+                spinnerAge.setSelection(((int)(long) dataSnapshot.child("age").getValue()));
+                spinnerGender.setSelection(((int)(long) dataSnapshot.child("gender").getValue()));
+                spinnerSize.setSelection(((int)(long) dataSnapshot.child("size").getValue()));
+                spinnerHealth.setSelection(((int)(long) dataSnapshot.child("health").getValue()));
+
+                if ((boolean) dataSnapshot.child("castrated").getValue()) {
+                    switchCastrated.setChecked(true);
+                }
+
+                if ((boolean) dataSnapshot.child("vaccinated").getValue()) {
+                    switchVaccinated.setChecked(true);
+                }
+
+                if ((boolean) dataSnapshot.child("wormed").getValue()) {
+                    switchWormed.setChecked(true);
+                }
+
+                additionalInfoField.setText((String) dataSnapshot.child("info").getValue());
+
+                getSupportActionBar().setTitle((String) dataSnapshot.child("name").getValue());
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public static Address getAddress(final Context context, final Location location) {
+
+        if (location == null)
+            return null;
+
+        final Geocoder geocoder = new Geocoder(context);
+        final List<Address> addresses;
+        try {
+            addresses = geocoder.getFromLocation(location.getLatitude(),
+                    location.getLongitude(), 1);
+        } catch (IOException e) {
+            return null;
+        }
+        if (addresses != null && !addresses.isEmpty())
+            return addresses.get(0);
+        else
+            return null;
+
+    }
+
+    private void createDropdown(List<String> list, Spinner sniner) {
+
+        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this, R.layout.spinner_item, list) {
+            @Override
+            public boolean isEnabled(int position) {
+                if (position == 0) {
+                    // Disable the first item from Spinner
+                    // First item will be use for hint
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView,
+                                        ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if (position == 0) {
+                    // Set the hint text color gray
+                    tv.setTextColor(Color.GRAY);
+                } else {
+                    tv.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
+
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+        sniner.setAdapter(spinnerArrayAdapter);
+
+    }
+
     public static String randomString() {
 
         Random generator = new Random();
@@ -452,6 +534,7 @@ public class PetCreateActivity extends AppCompatActivity implements
             if (resultCode == RESULT_OK) {
                 imageUri = result.getUri();
                 selectImage.setImageURI(imageUri);
+                imgChange = true;
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
             }

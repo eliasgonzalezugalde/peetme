@@ -40,6 +40,8 @@
     <string name="my_vets">My vets</string>
     <string name="my_account">My account</string>
 
+    <string name="updating_info" id="updating_info">Updating info</string>
+
     <string name="location_1" id="location_1">Location settings satisfy the settings.</string>
     <string name="location_2" id="location_2">Location settings do not satisfy the settings. A help dialog will be displayed.</string>
     <string name="location_3" id="location_3">Dialogue Intent does not work.</string>
@@ -71,6 +73,7 @@
     <string name="vet_deleted" id="vet_deleted">Vet deleted</string>
 
 
+    <string name="add" id="add">Add</string>
     <string name="add_image_from" id="add_image_from">Add image from</string>
     <string name="camera" id="camera">Camera</string>
     <string name="gallery" id="gallery">Gallery</string>
@@ -113,7 +116,9 @@
     <string name="image_not_found" id="image_not_found">Image not found</string>
 
     <string name="phone" id="phone">Phone</string>
-    <string name="phone_hint" id="phone_hint">Your phone number</string>
+    <string name="phone_animal_hint" id="phone_animal_hint">Your phone number</string>
+    <string name="phone_vet_hint" id="phone_vet_hint">Vet\'s telephone number</string>
+    <string name="name_vet_hint" id="name_vet_hint">Vet\'s name</string>
     <string name="open247" id="open247">Open 24/7</string>
     <string name="yes" id="yes">Yes</string>
     <string name="no" id="no">No</string>

@@ -45,7 +45,7 @@ public class VetSingleActivity extends AppCompatActivity {
                 textViewName.setText((String) dataSnapshot.child("name").getValue());
                 textViewPhone.setText((String) dataSnapshot.child("phone").getValue());
                 textViewCreatedDate.setText((String) dataSnapshot.child("createdDate").getValue());
-                if ((Boolean) dataSnapshot.child("open247").getValue()) {
+                if ((boolean) dataSnapshot.child("open247").getValue()) {
                     textViewOpen247.setText(getResources().getString(R.string.yes));
                 } else {
                     textViewOpen247.setText(getResources().getString(R.string.no));

@@ -40,6 +40,8 @@
     <string name="my_vets">Mis veterinarias</string>
     <string name="my_account">Mi cuenta</string>
 
+    <string name="updating_info" id="updating_info">Actualiando información</string>
+
     <string id="location_1" name="location_1">Los ajustes de ubicación satisfacen la configuración.</string>
     <string id="location_2" name="location_2">Los ajustes de ubicación no satisfacen la configuración. Se mostrará un diálogo de ayuda.</string>
     <string id="location_3" name="location_3">El Intent del diálogo no funcionó.</string>
@@ -70,6 +72,7 @@
     <string id="animal_deleted" name="animal_deleted">Animal borrado</string>
     <string name="vet_deleted" id="vet_deleted">Veterinaria borrada</string>
 
+    <string name="add" id="add">Agregar</string>
     <string id="add_image_from" name="add_image_from">Agregar imagen desde</string>
     <string id="camera" name="camera">Camara</string>
     <string id="gallery" name="gallery">Galería</string>
@@ -112,7 +115,9 @@
     <string name="image_not_found" id="image_not_found">Imagen no encontrada</string>
 
     <string name="phone" id="phone">Teléfono</string>
-    <string name="phone_hint" id="phone_hint">Tu número de teléfono</string>
+    <string name="phone_animal_hint" id="phone_animal_hint">Tu número de teléfono</string>
+    <string name="phone_vet_hint" id="phone_vet_hint">Número de teléfono de la veterinaria</string>
+    <string name="name_vet_hint" id="name_vet_hint">Nombre de la veterinaria</string>
     <string name="open247" id="open247">Abierto 24/7</string>
     <string name="yes" id="yes">Si</string>
     <string name="no" id="no">No</string>

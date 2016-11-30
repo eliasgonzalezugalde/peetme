@@ -272,7 +272,8 @@
                     android:layout_marginTop="20dp"
                     android:background="@drawable/input_outline"
                     android:ems="10"
-                    android:hint="@string/phone_hint"
+                    android:maxLines="1"
+                    android:hint="@string/phone_animal_hint"
                     android:padding="15dp"
                     android:textColorHint="@color/hintColor" />
 

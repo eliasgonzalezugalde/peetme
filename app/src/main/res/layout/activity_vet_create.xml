@@ -58,6 +58,7 @@
                     android:layout_marginTop="10dp"
                     android:background="@drawable/input_outline"
                     android:ems="10"
+                    android:hint="@string/name_vet_hint"
                     android:inputType="textCapWords"
                     android:maxLines="1"
                     android:padding="15dp"
@@ -68,6 +69,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/phone"
+                    android:maxLines="1"
                     android:textColor="@color/textViewColor"
                     android:textSize="20dp" />
 
@@ -79,6 +81,7 @@
                     android:layout_centerHorizontal="true"
                     android:layout_marginBottom="20dp"
                     android:layout_marginTop="10dp"
+                    android:hint="@string/phone_vet_hint"
                     android:background="@drawable/input_outline"
                     android:ems="10"
                     android:inputType="textMultiLine"

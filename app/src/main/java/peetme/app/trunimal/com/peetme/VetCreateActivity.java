@@ -27,6 +27,7 @@ import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -47,6 +48,7 @@ import java.util.Random;
 public class VetCreateActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    private static final String TAG = "VET_CREATE_ACTIVITY";
     private EditText nameField, phoneField;
     private TextView textViewLocationResult;
     private ImageButton selectImage;
@@ -62,9 +64,12 @@ public class VetCreateActivity extends AppCompatActivity implements
     private Location mLastLocation;
     private Date date;
     private CharSequence charSequence;
+    private String imgSaved;
+    private boolean imgChange;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vet_create);
 
@@ -80,16 +85,18 @@ public class VetCreateActivity extends AppCompatActivity implements
         mDatabaseVetLocations.keepSynced(true);
         mDatabaseVet = FirebaseDatabase.getInstance().getReference().child("vet");
         mDatabaseVet.keepSynced(true);
-        mProgress = new ProgressDialog(this);
-
         date = new Date();
         charSequence = DateFormat.format("dd/MM/yyyy", date.getTime());
+        mProgress = new ProgressDialog(this);
+        imgSaved = "";
+        imgChange = false;
 
         submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (getIntent().hasExtra("vet_id")){
-                    startUpdate();
+                    String vet_id = getIntent().getStringExtra("vet_id");
+                    startUpdate(vet_id);
                 } else {
                     startPosting();
                 }
@@ -115,34 +122,59 @@ public class VetCreateActivity extends AppCompatActivity implements
 
     }
 
-    private void fillFields() {
+    private void startUpdate(final String vet_id) {
 
-        mDatabaseVet.child(getIntent().getExtras().getString("vet_id")).addValueEventListener(new ValueEventListener() {
+        if (imgChange) {
 
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            mProgress.setMessage(getResources().getString(R.string.updating_info));
+            mProgress.show();
+            mProgress.setCancelable(false);
 
-                Picasso.with(VetCreateActivity.this).load((String) dataSnapshot.child("image").getValue()).into(selectImage);
-                nameField.setText((String) dataSnapshot.child("name").getValue());
-                phoneField.setText((String) dataSnapshot.child("phone").getValue());
-                if ((Boolean) dataSnapshot.child("open247").getValue()) {
-                    switchOpen247.setChecked(true);
+            final StorageReference imgToDeleteRef = FirebaseStorage.getInstance().getReferenceFromUrl(imgSaved); //IMG TO DELETE
+
+            StorageReference filepath = mStorage.child("Images").child("vet" + randomString());
+
+            filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
+
+                    //SI SE SUVE LA NUEVA IMG
+                    imgToDeleteRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+
+                            //SI SE BORRA LA VIEJA IMG
+                            Uri donwloadUrl = taskSnapshot.getDownloadUrl();
+                            mDatabaseVet.child(vet_id).child("image").setValue(donwloadUrl.toString());
+                            mProgress.dismiss();
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Uh-oh, an error occurred!
+                            mProgress.dismiss();
+                            Log.i(TAG, "Error deleting old img");
+                        }
+                    });
+
+
                 }
-                getSupportActionBar().setTitle((String) dataSnapshot.child("name").getValue());
+            });
 
-            }
-            @Override
+        }
 
-            public void onCancelled(DatabaseError databaseError) {
+        mDatabaseVet.child(vet_id).child("name").setValue(nameField.getText().toString().trim());
+        mDatabaseVet.child(vet_id).child("phone").setValue(phoneField.getText().toString().trim());
 
-            }
+        if (switchOpen247.isChecked()) {
+            mDatabaseVet.child(vet_id).child("open247").setValue(true);
+        } else {
+            mDatabaseVet.child(vet_id).child("open247").setValue(false);
+        }
 
-        });
+        //UBICATION
 
-    }
-
-    private void startUpdate() {
-        Toast.makeText(this, "startUpdate()", Toast.LENGTH_SHORT).show();
     }
 
     private void startPosting() {
@@ -164,7 +196,8 @@ public class VetCreateActivity extends AppCompatActivity implements
 
         if (!TextUtils.isEmpty(name_val)) {
 
-            //StorageReference filepath = mStorage.child("Pet_Images").child(imageUri.getLastPathSegment());
+            //StorageReference filepath = mStorage.child("Images").child(imageUri.getLastPathSegment());
+
             StorageReference filepath = mStorage.child("Images").child("vet" + randomString());
 
             filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -211,6 +244,35 @@ public class VetCreateActivity extends AppCompatActivity implements
 
     }
 
+    private void fillFields() {
+
+        mDatabaseVet.child(getIntent().getExtras().getString("vet_id")).addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                //IMG FOR UPDATING
+                imgSaved = (String) dataSnapshot.child("image").getValue();
+
+                Picasso.with(VetCreateActivity.this).load(imgSaved).into(selectImage);
+                nameField.setText((String) dataSnapshot.child("name").getValue());
+                phoneField.setText((String) dataSnapshot.child("phone").getValue());
+                if ((boolean) dataSnapshot.child("open247").getValue()) {
+                    switchOpen247.setChecked(true);
+                }
+                getSupportActionBar().setTitle((String) dataSnapshot.child("name").getValue());
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
+
+    }
+
     public static String randomString() {
 
         Random generator = new Random();
@@ -231,30 +293,20 @@ public class VetCreateActivity extends AppCompatActivity implements
 
         if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK) {
             imageUri = data.getData();
-
             startCropImageActivity(imageUri);
-
         }
 
-        //requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK //DIALOG
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == this.RESULT_OK) {
-
-            //Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
-            //imageUri = CropImage.getCaptureImageOutputUri(getApplicationContext());
-
             imageUri = CropImage.getPickImageResultUri(this, data);
             startCropImageActivity(imageUri);
-
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-
                 imageUri = result.getUri();
                 selectImage.setImageURI(imageUri);
-
+                imgChange = true;
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
             }
