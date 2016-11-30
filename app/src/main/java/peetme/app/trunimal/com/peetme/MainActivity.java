@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity
     private GeoFire geoFire;
     private GeoQuery geoQuery;
     private AlertDialog.Builder builder = null;
-    private final String PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
+    private final String ACCESS_FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private PermissionHelper permissionHelper;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity
         searchRadius = 4;
         mapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map));
         permissionHelper = PermissionHelper.getInstance(this);
-        permissionHelper.setForceAccepting(false).request(PERMISSION);
+        permissionHelper.setForceAccepting(false).request(ACCESS_FINE_LOCATION);
 
         mDatabaseLocations = FirebaseDatabase.getInstance().getReference().child("locations");
         mDatabaseLocations.keepSynced(true);
@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity
                 View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_update_radius, null);
                 final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder
-                        .setTitle(getResources().getString(R.string.set_range))
+                        .setTitle(getResources().getString(R.string.select_range))
                         .setView(view);
 
                 final TextView textViewRadius = (TextView) view.findViewById(R.id.range);
@@ -328,7 +328,7 @@ public class MainActivity extends AppCompatActivity
                     if (!dataSnapshot.hasChild(mAuth.getCurrentUser().getUid())) {
                         //superposicion
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.config_account), Toast.LENGTH_SHORT).show();
-                        //startActivity(new Intent(MainActivity.this, SetupActivity.class));
+                        //startActivity(new Intent(MainActivity.this, MyAccountActivity.class));
                     }
                 }
 
@@ -412,7 +412,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            startActivity(new Intent(MainActivity.this, SetupActivity.class));// return true;
+            startActivity(new Intent(MainActivity.this, MyAccountActivity.class));// return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_settings) {
 
-            startActivity(new Intent(MainActivity.this, SetupActivity.class));
+            startActivity(new Intent(MainActivity.this, MyAccountActivity.class));
 
         } else if (id == R.id.nav_sing_out) {
 
@@ -480,45 +480,40 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
-        if (isLocationPermissionGranted()) {
+        if (permissionHelper.isPermissionGranted(ACCESS_FINE_LOCATION)) {
             iniciateLocation();
         }
 
     }
 
+    @Override
+    public void onConnectionSuspended(int i) {
+        Toast.makeText(this, getResources().getString(R.string.connection_suspended), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, getResources().getString(R.string.failed_to_connect), Toast.LENGTH_SHORT).show();
+    }
+
     public void iniciateLocation() {
+
         // Obtenemos la última ubicación al ser la primera vez
         processLastLocation();
-
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
-
         currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
         currentMarkerOptions = new MarkerOptions()
                 .position(currentLocation)
                 .title(getResources().getString(R.string.current_location))
-                //.snippet("Parque de Cuidad Quesada")
                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.pin_current_blue));
-        //.anchor(0.0f, 1.0f);
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
         //mMap.setMyLocationEnabled(true);
-
-        //circulo
         circle = this.mMap.addCircle(new CircleOptions().center(currentLocation).radius(searchRadius * 1000));
         circle.setFillColor(Color.argb(40, 66, 133, 244));
         circle.setStrokeColor(Color.argb(75, 57, 115, 211));
-        //rojo
-        //circle.setFillColor(Color.argb(40, 229, 50, 29));
-        //circle.setStrokeColor(Color.argb(75, 229, 50, 29));
-
-
         // Iniciamos las actualizaciones de ubicación
         startLocationUpdates();
+
     }
 
     @Override
@@ -530,87 +525,45 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startLocationUpdates() {
-        //if (isLocationPermissionGranted()) {
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, locationRequest, this);
-        //} else {
-        //manageDeniedPermission();
-        //}
+
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
         permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        /*
-        if (requestCode == REQUEST_LOCATION) {
-            if (grantResults.length == 1
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                if (mLastLocation != null) {
-                    //mLatitude.setText(String.valueOf(mLastLocation.getLatitude()));
-                    //mLongitude.setText(String.valueOf(mLastLocation.getLongitude()));
-                    //Toast.makeText(this, String.valueOf(mLastLocation.getLongitude()), Toast.LENGTH_LONG).show();
-
-                } else {
-                    Toast.makeText(this, getResources().getString(R.string.location_not_found), Toast.LENGTH_LONG).show();
-                }
-            } else {
-                //superposicion
-                //Toast.makeText(this, getResources().getString(R.string.permissions), Toast.LENGTH_LONG).show();
-            }
-        }
-        */
     }
 
     private void processLastLocation() {
+
         getLastLocation();
         if (mLastLocation != null) {
             updateLocationUI();
         } else {
             Log.i(TAG, getResources().getString(R.string.null_location));
         }
+
     }
 
     private void getLastLocation() {
-        //if (isLocationPermissionGranted()) {
-//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                return;
-//            }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        //} else {
-        //manageDeniedPermission();
-        //}
-    }
 
-    private boolean isLocationPermissionGranted() {
-        int permission = ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-        return permission == PackageManager.PERMISSION_GRANTED;
-    }
-
-    /*
-    private void manageDeniedPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // Aquí muestras confirmación explicativa al usuario
-            // por si rechazó los permisos anteriormente
+        if (permissionHelper.isPermissionGranted(ACCESS_FINE_LOCATION)) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         } else {
-            ActivityCompat.requestPermissions(
-                    this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_LOCATION);
+            //--
         }
+
     }
-    */
+
     private void updateLocationUI() {
 
         Log.i(getResources().getString(R.string.latitude), String.valueOf(mLastLocation.getLatitude()));
@@ -630,30 +583,33 @@ public class MainActivity extends AppCompatActivity
                         currentMarker = mMap.addMarker(currentMarkerOptions);
                     } else {
                         currentMarker.setPosition(currentLocation);
-                        //borrar circulo
                         circle.setCenter(currentLocation);
                     }
 
                 }
 
             });
-
         }
+
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+
         // Protegemos la ubicación actual antes del cambio de configuración
         outState.putParcelable(LOCATION_KEY, mLastLocation);
         super.onSaveInstanceState(outState);
+
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
+
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(LOCATION_KEY)) {
                 mLastLocation = savedInstanceState.getParcelable(LOCATION_KEY);
             }
         }
+
     }
 
     @Override
@@ -667,9 +623,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-//        if (mGoogleApiClient.isConnected()) {
-//            stopLocationUpdates();
-//        }
+        if (mGoogleApiClient.isConnected()) {
+            stopLocationUpdates();
+        }
     }
 
     protected void stopLocationUpdates() {
@@ -678,6 +634,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     //////////////////////////////////////////////////////////GeoQueryEventListener/////////////////////////////////////////////////////////////
+
     @Override
     public void onKeyEntered(String key, GeoLocation location) {
         // Add a new marker to the map
@@ -694,44 +651,41 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onKeyExited(String key) {
+
         // Remove any old marker
-        /*
         Marker marker = this.markers.get(key);
         if (marker != null) {
             marker.remove();
             this.markers.remove(key);
         }
-        */
+
     }
 
     @Override
     public void onKeyMoved(String key, GeoLocation location) {
+
         // Move the marker
-        /*
         Marker marker = this.markers.get(key);
         if (marker != null) {
             //marker.setTag(key);
             this.animateMarkerTo(marker, location.latitude, location.longitude);
         }
-        */
+
     }
 
     @Override
     public void onGeoQueryReady() {
+
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-
                 if (marker.getTag() != null) {
-
                     String cadena = String.valueOf(marker.getTag()).substring(3);
-
                     if (String.valueOf(marker.getTag()).substring(0, 3).equals("pet")) {
 
                         Intent intent = new Intent(MainActivity.this, PetSingleActivity.class);
                         intent.putExtra("pet_id", cadena);
                         startActivity(intent);
-
                     } else {
                         Intent intent = new Intent(MainActivity.this, VetSingleActivity.class);
                         intent.putExtra("vet_id", cadena);
@@ -741,16 +695,19 @@ public class MainActivity extends AppCompatActivity
                 return false;
             }
         });
+
     }
 
     @Override
     public void onGeoQueryError(DatabaseError error) {
+
         new AlertDialog.Builder(this)
                 .setTitle("Error")
                 .setMessage(getResources().getString(R.string.error_geofire) + error.getMessage())
                 .setPositiveButton(android.R.string.ok, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+
     }
 
     private void animateMarkerTo(final Marker marker, final double lat, final double lng) {
@@ -780,19 +737,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    //////////////////////////////////////////////////////////GeoQueryEventListener/////////////////////////////////////////////////////////////
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Toast.makeText(this, getResources().getString(R.string.connection_suspended), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(this, getResources().getString(R.string.failed_to_connect), Toast.LENGTH_SHORT).show();
-    }
-
-    //////////////////////////////////////////////////////////PERMISOS/////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////PermissionHelper/////////////////////////////////////////////////////////////
 
     @Override
     public void onPermissionGranted(@NonNull String[] permissionName) {
@@ -818,7 +763,7 @@ public class MainActivity extends AppCompatActivity
                 .setPositiveButton("Request", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        permissionHelper.requestAfterExplanation(PERMISSION);
+                        permissionHelper.requestAfterExplanation(ACCESS_FINE_LOCATION);
                     }
                 })
                 .create();

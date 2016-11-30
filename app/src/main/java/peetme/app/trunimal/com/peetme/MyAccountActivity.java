@@ -1,24 +1,14 @@
 package peetme.app.trunimal.com.peetme;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Environment;
-import android.os.Parcelable;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -27,31 +17,19 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
-public class SetupActivity extends AppCompatActivity {
+public class MyAccountActivity extends AppCompatActivity {
 
     private static final String TAG = "SETUP_ACTIVITY";
     private EditText nameField;
@@ -71,7 +49,7 @@ public class SetupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setup);
+        setContentView(R.layout.activity_my_account);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         emailField = (TextView) findViewById(R.id.emailField);
@@ -89,7 +67,7 @@ public class SetupActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 
                 if (firebaseAuth.getCurrentUser() == null) {
-                    startActivity(new Intent(SetupActivity.this, LoginWithActivity.class));
+                    startActivity(new Intent(MyAccountActivity.this, LoginWithActivity.class));
                 } else {
                     emailField.setText(firebaseAuth.getCurrentUser().getEmail());
                     nameField.setText(firebaseAuth.getCurrentUser().getDisplayName());
@@ -106,7 +84,7 @@ public class SetupActivity extends AppCompatActivity {
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(CropImage.getPickImageChooserIntent(SetupActivity.this, getResources().getString(R.string.add_image_from), true), 200);
+                startActivityForResult(CropImage.getPickImageChooserIntent(MyAccountActivity.this, getResources().getString(R.string.add_image_from), true), 200);
             }
         });
 
@@ -137,10 +115,10 @@ public class SetupActivity extends AppCompatActivity {
                     current_user_db.child("name").setValue(nameField.getText().toString().trim());
                     current_user_db.child("image").setValue(donwloadUrl.toString());
                     finish();
-                    Toast.makeText(SetupActivity.this, getResources().getString(R.string.saved), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MyAccountActivity.this, getResources().getString(R.string.saved), Toast.LENGTH_SHORT).show();
                     mProgress.dismiss();
                     finish();
-                    startActivity(new Intent(SetupActivity.this, MainActivity.class));
+                    startActivity(new Intent(MyAccountActivity.this, MainActivity.class));
                 }
             });
         } else {
@@ -207,14 +185,6 @@ public class SetupActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-
     }
 
     @Override

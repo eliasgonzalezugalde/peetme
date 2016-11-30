@@ -1,5 +1,6 @@
 package peetme.app.trunimal.com.peetme;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -24,16 +25,15 @@ public class MyVetsActivity extends AppCompatActivity {
 
     }
 
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_add) {
+            startActivity(new Intent(MyVetsActivity.this, VetCreateActivity.class));
+        } else {
+            this.finish();
+            return true;
         }
 
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -1,6 +1,7 @@
 package peetme.app.trunimal.com.peetme;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -130,13 +131,14 @@ public class MyPetsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_add) {
+            startActivity(new Intent(MyPetsActivity.this, PetCreateActivity.class));
+        } else {
+            this.finish();
+            return true;
         }
 
+        return super.onOptionsItemSelected(item);
     }
+
 }

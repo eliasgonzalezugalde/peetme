@@ -18,7 +18,7 @@
     <string name="setup_account" id="setup_account">Error de autenticación</string>
     <string name="save" id="save">Guardar</string>
 
-    <string name="text_login" id="text_login">Si ya tienes una cuenta, solamente ingresa, si no es así, presiona el botón de registro</string>
+    <string name="text_login" id="text_login">Ingresar</string>
     <string name="log_in" id="log_in">Iniciar sesión</string>
     <string name="register" id="register">Registrarse</string>
     <string name="create_account" id="create_account">Crear nueva cuenta</string>
@@ -38,12 +38,13 @@
     <string name="stray_animal">Animales extraviados</string>
     <string name="my_pets">Mis animales</string>
     <string name="my_vets">Mis veterinarias</string>
+    <string name="my_account">Mi cuenta</string>
 
     <string id="location_1" name="location_1">Los ajustes de ubicación satisfacen la configuración.</string>
     <string id="location_2" name="location_2">Los ajustes de ubicación no satisfacen la configuración. Se mostrará un diálogo de ayuda.</string>
     <string id="location_3" name="location_3">El Intent del diálogo no funcionó.</string>
     <string id="location_4" name="location_4">Los ajustes de ubicación no son apropiados.</string>
-    <string id="set_range" name="set_range">Seleccionar el rango de búsqueda</string>
+    <string id="select_range" name="select_range">Seleccione el rango de búsqueda</string>
     <string id="range_updated" name="range_updated">Rango de búsqueda actualizado</string>
     <string id="current_location" name="current_location">Ubicacion actual.</string>
     <string id="config_account" name="config_account">Necesitas configurar tu cuenta.</string>
@@ -74,6 +75,8 @@
 
     <string name="title_activity_pet_index">Animales</string>
     <string name="title_activity_pet_create">Agregando un animal</string>
+    <string name="title_activity_my_animals">Mis animales</string>
+    <string name="title_activity_my_vets">Mis veterinarias</string>
 
     <string name="title_activity_vet_index">Veterinarias</string>
     <string name="title_activity_vet_create">Agregando veterinaria</string>

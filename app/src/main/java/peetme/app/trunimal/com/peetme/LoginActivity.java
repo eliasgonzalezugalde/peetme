@@ -131,7 +131,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChild(mAuth.getCurrentUser().getUid())) {
                     Toast.makeText(LoginActivity.this, "You need to setup your account", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(LoginActivity.this, SetupActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, MyAccountActivity.class);
                     //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }

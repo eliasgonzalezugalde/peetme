@@ -113,13 +113,17 @@
             android:name=".StrayCreateActivity"
             android:label="@string/title_activity_stray_create" />
         <activity
-            android:name=".SetupActivity"
-            android:label="Profile" />
+            android:name=".MyAccountActivity"
+            android:label="@string/my_account" />
         <activity android:name=".PetSingleActivity" />
         <activity android:name=".VetSingleActivity" />
         <activity
-            android:name=".MyPetsActivity" />
-        <activity android:name=".MyVetsActivity"></activity>
+            android:name=".MyPetsActivity"
+            android:label="@string/title_activity_my_animals" />
+        <activity
+            android:name=".MyVetsActivity"
+            android:label="@string/title_activity_my_vets" />
+        <activity android:name=".PetEditActivity"></activity>
     </application>
 
 </manifest>
