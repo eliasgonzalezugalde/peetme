@@ -27,6 +27,7 @@ public class PetIndexActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("pet");
+        mDatabase.keepSynced(true);
 
         petList = (RecyclerView) findViewById(R.id.animalList);
         petList.setHasFixedSize(true);

@@ -32,7 +32,10 @@ public class MyVetsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("vet");
+        mDatabase.keepSynced(true);
         mDatabaseLocations = FirebaseDatabase.getInstance().getReference().child("locations");
+        mDatabaseLocations.keepSynced(true);
+
         queryRef = mDatabase.orderByChild("uid").equalTo(String.valueOf(FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
         vetList = (RecyclerView) findViewById(R.id.vetList);

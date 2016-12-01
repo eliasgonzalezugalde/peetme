@@ -25,6 +25,7 @@ public class VetIndexActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("vet");
+        mDatabase.keepSynced(true);
 
         vetList = (RecyclerView) findViewById(R.id.vetList);
         vetList.setHasFixedSize(true);

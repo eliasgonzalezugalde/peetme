@@ -29,6 +29,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.vision.text.Text;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -124,45 +125,74 @@ public class VetCreateActivity extends AppCompatActivity implements
 
     private void startUpdate(final String vet_id) {
 
-        if (imgChange) {
+        mProgress.setMessage(getResources().getString(R.string.updating_info) + " ...");
+        mProgress.show();
+        mProgress.setCancelable(false);
 
-            mProgress.setMessage(getResources().getString(R.string.updating_info));
-            mProgress.show();
-            mProgress.setCancelable(false);
+        //VALIDATING FIELDS
+        if (fieldsAreFilled()) {
 
-            final StorageReference imgToDeleteRef = FirebaseStorage.getInstance().getReferenceFromUrl(imgSaved); //IMG TO DELETE
+            if (imgChange) {
 
-            StorageReference filepath = mStorage.child("Images").child("vet" + randomString());
+                final StorageReference imgToDeleteRef = FirebaseStorage.getInstance().getReferenceFromUrl(imgSaved); //IMG TO DELETE
+                StorageReference filepath = mStorage.child("Images").child("vet" + randomString());
+                filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
-            filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) { //SI SE SUVE LA NUEVA IMG
 
-                    //SI SE SUVE LA NUEVA IMG
-                    imgToDeleteRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
+                        final Uri donwloadUrl = taskSnapshot.getDownloadUrl();
+                        updateFieldsNoImage(vet_id); //UPDATE ALL THE FIELDS, EXCEPT THE IMAGE
 
-                            //SI SE BORRA LA VIEJA IMG
-                            Uri donwloadUrl = taskSnapshot.getDownloadUrl();
-                            mDatabaseVet.child(vet_id).child("image").setValue(donwloadUrl.toString());
-                            mProgress.dismiss();
+                        imgToDeleteRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
 
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Uh-oh, an error occurred!
-                            mProgress.dismiss();
-                            Log.i(TAG, "Error deleting old img");
-                        }
-                    });
+                            @Override
+                            public void onSuccess(Void aVoid) { //SI SE BORRA LA VIEJA IMG
+                                mDatabaseVet.child(vet_id).child("image").setValue(donwloadUrl.toString());
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Uh-oh, an error occurred!
+                                mProgress.dismiss();
+                                Log.i(TAG, String.valueOf(exception.getMessage()));
+                            }
+                        });
+
+                        //HERE
+                        mProgress.dismiss();
+                        finish();
+                        Toast.makeText(VetCreateActivity.this, getResources().getString(R.string.vet_saved), Toast.LENGTH_SHORT).show();
+
+                    }
+                });
 
 
-                }
-            });
+            } else {
+                updateFieldsNoImage(vet_id);
+                mProgress.dismiss();
+                finish();
+                Toast.makeText(VetCreateActivity.this, getResources().getString(R.string.vet_saved), Toast.LENGTH_SHORT).show();
+            }
 
+
+        } else {
+            mProgress.dismiss();
+            Toast.makeText(this, getResources().getString(R.string.fields_empty), Toast.LENGTH_SHORT).show();
         }
+
+    }
+
+    public boolean fieldsAreFilled() {
+        if (!TextUtils.isEmpty(nameField.getText().toString().trim())
+                && !TextUtils.isEmpty(phoneField.getText().toString().trim())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void updateFieldsNoImage(final String vet_id) {
 
         mDatabaseVet.child(vet_id).child("name").setValue(nameField.getText().toString().trim());
         mDatabaseVet.child(vet_id).child("phone").setValue(phoneField.getText().toString().trim());
@@ -172,8 +202,6 @@ public class VetCreateActivity extends AppCompatActivity implements
         } else {
             mDatabaseVet.child(vet_id).child("open247").setValue(false);
         }
-
-        //UBICATION
 
     }
 
@@ -194,10 +222,9 @@ public class VetCreateActivity extends AppCompatActivity implements
             open247_val = false;
         }
 
-        if (!TextUtils.isEmpty(name_val)) {
+        if (fieldsAreFilled() && imageUri != null) {
 
             //StorageReference filepath = mStorage.child("Images").child(imageUri.getLastPathSegment());
-
             StorageReference filepath = mStorage.child("Images").child("vet" + randomString());
 
             filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -232,7 +259,6 @@ public class VetCreateActivity extends AppCompatActivity implements
                     mProgress.dismiss();
                     finish();
                     Toast.makeText(VetCreateActivity.this, getResources().getString(R.string.vet_saved), Toast.LENGTH_SHORT).show();
-                    //startActivity(new Intent(VetCreateActivity.this, VetIndexActivity.class));
 
                 }
             });

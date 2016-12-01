@@ -113,8 +113,6 @@ public class PetCreateActivity extends AppCompatActivity implements
         submitBtn = (Button) findViewById(R.id.submitBtn);
         locationBtn = (Button) findViewById(R.id.locationBtn);
 
-
-
         spinnerAge = (Spinner) findViewById(R.id.spinnerAge);
         spinnerHealth = (Spinner) findViewById(R.id.spinnerHealth);
         spinnerSize = (Spinner) findViewById(R.id.spinnerSize);
@@ -225,47 +223,63 @@ public class PetCreateActivity extends AppCompatActivity implements
 
     private void startUpdate(final String pet_id) {
 
-        if (imgChange) {
+        mProgress.setMessage(getResources().getString(R.string.updating_info));
+        mProgress.show();
+        mProgress.setCancelable(false);
 
-            mProgress.setMessage(getResources().getString(R.string.updating_info));
-            mProgress.show();
-            mProgress.setCancelable(false);
+        //VALIDATING FIELDS
+        if (fieldsAreFilled()) {
 
-            final StorageReference imgToDeleteRef = FirebaseStorage.getInstance().getReferenceFromUrl(imgSaved); //IMG TO DELETE
+            if (imgChange) {
 
-            StorageReference filepath = mStorage.child("Images").child("pet" + randomString());
+                final StorageReference imgToDeleteRef = FirebaseStorage.getInstance().getReferenceFromUrl(imgSaved); //IMG TO DELETE
+                StorageReference filepath = mStorage.child("Images").child("pet" + randomString());
+                filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
-            filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
+                    @Override
+                    public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) { //SI SE SUVE LA NUEVA IMG
 
-                    //SI SE SUVE LA NUEVA IMG
-                    imgToDeleteRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
+                        final Uri donwloadUrl = taskSnapshot.getDownloadUrl();
+                        updateFieldsNoImage(pet_id);
 
-                            //SI SE BORRA LA VIEJA IMG
-                            Uri donwloadUrl = taskSnapshot.getDownloadUrl();
-                            mDatabasePet.child(pet_id).child("image").setValue(donwloadUrl.toString());
-                            mProgress.dismiss();
+                        imgToDeleteRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
 
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Uh-oh, an error occurred!
-                            mProgress.dismiss();
-                            Log.i(TAG, "Error deleting old img");
-                        }
-                    });
+                            @Override
+                            public void onSuccess(Void aVoid) { //SI SE BORRA LA VIEJA IMG
+                                mDatabasePet.child(pet_id).child("image").setValue(donwloadUrl.toString());
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Uh-oh, an error occurred!
+                                mProgress.dismiss();
+                                Log.i(TAG, String.valueOf(exception.getMessage()));
+                            }
+                        });
 
+                        mProgress.dismiss();
+                        finish();
+                        Toast.makeText(PetCreateActivity.this, getResources().getString(R.string.pet_saved), Toast.LENGTH_SHORT).show();
 
-                }
-            });
+                    }
+                });
 
+            } else {
+                updateFieldsNoImage(pet_id);
+                mProgress.dismiss();
+                finish();
+                Toast.makeText(PetCreateActivity.this, getResources().getString(R.string.pet_saved), Toast.LENGTH_SHORT).show();
+
+            }
+        } else {
+            mProgress.dismiss();
+            Toast.makeText(this, getResources().getString(R.string.fields_empty), Toast.LENGTH_SHORT).show();
         }
 
-        //TODOS LOS DATOS
+    }
+
+    private void updateFieldsNoImage(final String pet_id) {
+
         mDatabasePet.child(pet_id).child("name").setValue(nameField.getText().toString().trim());
         mDatabasePet.child(pet_id).child("phone").setValue(phoneField.getText().toString().trim());
         mDatabasePet.child(pet_id).child("description").setValue(descField.getText().toString().trim());
@@ -295,7 +309,24 @@ public class PetCreateActivity extends AppCompatActivity implements
             mDatabasePet.child(pet_id).child("wormed").setValue(false);
         }
 
-        //UBICATION
+    }
+
+    public boolean fieldsAreFilled() {
+
+        if (!TextUtils.isEmpty(nameField.getText().toString().trim())
+                && !TextUtils.isEmpty(descField.getText().toString().trim())
+                && !TextUtils.isEmpty(phoneField.getText().toString().trim())
+                //&& !TextUtils.isEmpty(additionalInfoField.getText().toString().trim())
+                && spinnerSpecies.getSelectedItemPosition() != 0
+                && spinnerAge.getSelectedItemPosition() != 0
+                && spinnerGender.getSelectedItemPosition() != 0
+                && spinnerSize.getSelectedItemPosition() != 0
+                && spinnerHealth.getSelectedItemPosition() != 0
+                ) {
+            return true;
+        } else {
+            return false;
+        }
 
     }
 
@@ -330,16 +361,7 @@ public class PetCreateActivity extends AppCompatActivity implements
             wormed_val = false;
         }
 
-        if (!TextUtils.isEmpty(name_val)
-                && !TextUtils.isEmpty(desc_val)
-                && !TextUtils.isEmpty(phone_val)
-                && imageUri != null
-                //&& !TextUtils.isEmpty(additional_info_val)
-                && spinnerAge.getSelectedItemPosition() != 0
-                && spinnerSpecies.getSelectedItemPosition() != 0
-                && spinnerGender.getSelectedItemPosition() != 0
-                && spinnerSize.getSelectedItemPosition() != 0
-                && spinnerHealth.getSelectedItemPosition() != 0) {
+        if (fieldsAreFilled() && imageUri != null) {
 
             //StorageReference filepath = mStorage.child("Pet_Images").child(imageUri.getLastPathSegment());
             StorageReference filepath = mStorage.child("Images").child("pet" + randomString());
