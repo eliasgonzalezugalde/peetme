@@ -74,6 +74,8 @@
 
 
     <string name="add" id="add">Add</string>
+    <string name="add_an_animal" id="add_an_animal">Add an animal</string>
+    <string name="add_a_vet" id="add_a_vet">Add a vet</string>
     <string name="add_image_from" id="add_image_from">Add image from</string>
     <string name="camera" id="camera">Camera</string>
     <string name="gallery" id="gallery">Gallery</string>

@@ -425,11 +425,11 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_animals) {
 
-            startActivity(new Intent(MainActivity.this, PetIndexActivity.class));
+            startActivity(new Intent(MainActivity.this, PetCreateActivity.class));
 
         } else if (id == R.id.nav_vets) {
 
-            startActivity(new Intent(MainActivity.this, VetIndexActivity.class));
+            startActivity(new Intent(MainActivity.this, VetCreateActivity.class));
 
         } /*else if (id == R.id.nav_animal_shelters) {
 
@@ -663,12 +663,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onKeyMoved(String key, GeoLocation location) {
-
         // Move the marker
         Marker marker = this.markers.get(key);
         if (marker != null) {
-            //marker.setTag(key);
             this.animateMarkerTo(marker, location.latitude, location.longitude);
+            //HERE
+            //updateLocationUI();
         }
 
     }
@@ -710,8 +710,8 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    // Animation handler for old APIs without animation support
     private void animateMarkerTo(final Marker marker, final double lat, final double lng) {
-
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
         final long DURATION_MS = 3000;
@@ -721,7 +721,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
                 float elapsed = SystemClock.uptimeMillis() - start;
-                float t = elapsed / DURATION_MS;
+                float t = elapsed/DURATION_MS;
                 float v = interpolator.getInterpolation(t);
 
                 double currentLat = (lat - startPosition.latitude) * v + startPosition.latitude;
@@ -734,7 +734,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-
     }
 
     //////////////////////////////////////////////////////////PermissionHelper/////////////////////////////////////////////////////////////

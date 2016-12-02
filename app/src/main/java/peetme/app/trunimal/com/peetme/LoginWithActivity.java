@@ -129,7 +129,7 @@ public class LoginWithActivity extends AppCompatActivity {
 
     }
 
-    private void handleFacebookAccessToken(AccessToken token) {
+    private void handleFacebookAccessToken(AccessToken token) { //Facebook
         Log.d(TAG, "handleFacebookAccessToken:" + token);
 
         progressBar.setVisibility(View.VISIBLE);
@@ -145,6 +145,10 @@ public class LoginWithActivity extends AppCompatActivity {
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
+
+                        goMainActivity();
+                        //comentado
+                        /*
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(LoginWithActivity.this, "Authentication failed.",
@@ -152,6 +156,8 @@ public class LoginWithActivity extends AppCompatActivity {
                         } else {
                             //checkUserExist();
                         }
+                        */
+
                         progressBar.setVisibility(View.GONE);
                         loginButton.setVisibility(View.VISIBLE);
 

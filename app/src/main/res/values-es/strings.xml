@@ -73,6 +73,8 @@
     <string name="vet_deleted" id="vet_deleted">Veterinaria borrada</string>
 
     <string name="add" id="add">Agregar</string>
+    <string name="add_an_animal" id="add_an_animal">Agregar un animal</string>
+    <string name="add_a_vet" id="add_a_vet">Agregar veterinaria</string>
     <string id="add_image_from" name="add_image_from">Agregar imagen desde</string>
     <string id="camera" name="camera">Camara</string>
     <string id="gallery" name="gallery">Galería</string>

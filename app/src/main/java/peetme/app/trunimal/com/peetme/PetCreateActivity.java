@@ -463,7 +463,7 @@ public class PetCreateActivity extends AppCompatActivity implements
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.e(TAG, databaseError.getMessage());
             }
         });
 

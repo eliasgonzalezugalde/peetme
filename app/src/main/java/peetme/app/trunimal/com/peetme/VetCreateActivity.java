@@ -137,7 +137,6 @@ public class VetCreateActivity extends AppCompatActivity implements
                 final StorageReference imgToDeleteRef = FirebaseStorage.getInstance().getReferenceFromUrl(imgSaved); //IMG TO DELETE
                 StorageReference filepath = mStorage.child("Images").child("vet" + randomString());
                 filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) { //SI SE SUVE LA NUEVA IMG
 
@@ -292,7 +291,7 @@ public class VetCreateActivity extends AppCompatActivity implements
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.e(TAG, databaseError.getMessage());
             }
 
         });
